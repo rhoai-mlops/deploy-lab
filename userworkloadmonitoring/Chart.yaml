@@ -1,0 +1,10 @@
+---
+apiVersion: v2
+description: A Helm chart for enable User Workload Monitoring
+name: uwm
+version: 0.0.1
+home: https://rhoai-mlops.github.io/mlops/
+maintainers:
+  - name: RHRolun
+  - name: rcarrata
+  - name: ckavili
