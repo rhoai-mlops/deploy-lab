@@ -1,12 +1,13 @@
 ---
-cluster_domain: <CLUSTER_DOMAIN>
-attendees: 2
+cluster_domain: apps.cluster-8gj46.dynamic.redhatworkshops.io
+attendees: 3
 
 minio:
   buckets:
     - name: pipeline
     - name: models
 gitlab:
+  app_name: gitlab-ce 
   namespace: gitlab
   root_password: 7aydhn160bOrrsGEbnd172rE
   imagestreams:
