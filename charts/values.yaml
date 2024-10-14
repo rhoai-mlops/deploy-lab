@@ -1,5 +1,5 @@
 ---
-cluster_api: apps.cluster-xxx.xxx.sandboxyyy.opentlc.com
+cluster_domain: <CLUSTER_DOMAIN>
 attendees: 2
 
 minio:

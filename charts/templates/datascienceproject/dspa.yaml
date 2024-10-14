@@ -1,4 +1,4 @@
-{{ $cluster_api := .Values.cluster_api }}
+{{ $cluster_domain := .Values.cluster_domain }}
 {{ $attendees := (.Values.attendees | int) }}
 {{- range $attendee := until $attendees }}
 ---
@@ -39,7 +39,7 @@ spec:
     externalStorage:
       basePath: ''
       bucket: pipeline
-      host: 'minio-api-user{{ $attendee }}.{{ $cluster_api }}'
+      host: 'minio-api-user{{ $attendee }}.{{ $cluster_domain }}'
       port: ''
       region: wonderland
       s3CredentialsSecret:
