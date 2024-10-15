@@ -19,7 +19,7 @@ spec:
     targetPort: 80
   selector:
     app: "{{ $.Values.gitlab.app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab.app_name }}"
+    deployment: "{{ $.Values.gitlab.app_name }}"
   type: ClusterIP
   sessionAffinity: None
 ---
@@ -38,7 +38,7 @@ spec:
     targetPort: 6379
   selector:
     app: "{{ $.Values.gitlab.app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab.app_name }}-redis"
+    deployment: "{{ $.Values.gitlab.app_name }}-redis"
   type: ClusterIP
   sessionAffinity: None
 ---
@@ -57,7 +57,7 @@ spec:
     targetPort: 5432
   selector:
     app: "{{ $.Values.gitlab.app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab.app_name }}-postgresql"
+    deployment: "{{ $.Values.gitlab.app_name }}-postgresql"
   type: ClusterIP
   sessionAffinity: None
 {{- end }}
