@@ -94,7 +94,7 @@ spec:
             path: "/help"
             port: 80 
             scheme: HTTP
-          initialDelaySeconds: 120
+          initialDelaySeconds: 300
           timeoutSeconds: 1
           periodSeconds: 10
           successThreshold: 1
