@@ -1,10 +1,13 @@
-{{ $cluster_api := .Values.cluster_api }}
+{{ $cluster_domain := .Values.cluster_domain }}
 {{ $attendees := (.Values.attendees | int) }}
 {{- range $attendee := until $attendees }}
 ---
 apiVersion: datasciencepipelinesapplications.opendatahub.io/v1alpha1
 kind: DataSciencePipelinesApplication
 metadata:
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
   finalizers:
     - datasciencepipelinesapplications.opendatahub.io/finalizer
   name: dspa
@@ -39,13 +42,13 @@ spec:
     externalStorage:
       basePath: ''
       bucket: pipeline
-      host: 'minio-api-user{{ $attendee }}.{{ $cluster_api }}'
+      host: 'https://minio-api-user{{ $attendee }}.{{ $cluster_domain }}'
       port: ''
       region: wonderland
       s3CredentialsSecret:
         accessKey: AWS_ACCESS_KEY_ID
         secretKey: AWS_SECRET_ACCESS_KEY
-        secretName: dashboard-dspa-secret
+        secretName: aws-connection-pipeline
       scheme: http
   persistenceAgent:
     deploy: true

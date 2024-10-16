@@ -1,57 +1,32 @@
 {{- if .Values.gitlab -}}
-{{ $db_user := include "gitlab.postgres.user" . }}
-{{ $db_pass := include "gitlab.postgres.password" . }}
-{{ $db_admin_pass := include "gitlab.postgres.admin_password" . }}
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
-  name: "{{ $.Values.gitlab_app_name }}"
+  name: "{{ $.Values.gitlab.app_name }}"
   namespace: "{{ $.Values.gitlab.namespace }}"
   labels:
-    app: "{{ $.Values.gitlab_app_name }}"
+    app: "{{ $.Values.gitlab.app_name }}"
 spec:
   strategy:
     type: Recreate
-  triggers:
-  - type: ConfigChange
-  - type: ImageChange
-    imageChangeParams:
-      automatic: true
-      containerNames:
-      - gitlab-ce
-      from:
-        kind: ImageStreamTag
-        name: "{{ $.Values.gitlab_app_name }}:gitlab-12.8.7"
   replicas: 1
-  test: false
   selector:
-    app: "{{ $.Values.gitlab_app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab_app_name }}"
+    matchLabels:
+      app: "{{ $.Values.gitlab.app_name }}"
   template:
     metadata:
       labels:
-        app: "{{ $.Values.gitlab_app_name }}"
-        deploymentconfig: "{{ $.Values.gitlab_app_name }}"
+        app: "{{ $.Values.gitlab.app_name }}"
+        deployment: "{{ $.Values.gitlab.app_name }}"
     spec:
-      {{- if .Values.runOnInfra }}
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      - effect: NoExecute
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      {{- end }}
       volumes:
       - name: gitlab-ce-volume-1
         persistentVolumeClaim:
-          claimName: "{{ $.Values.gitlab_app_name }}-etc"
+          claimName: "{{ $.Values.gitlab.app_name }}-etc"
       - name: gitlab-ce-volume-2
         persistentVolumeClaim:
-          claimName: "{{ $.Values.gitlab_app_name }}-data"
+          claimName: "{{ $.Values.gitlab.app_name }}-data"
 {{- if .Values.gitlab.cacert }}
       - name: gitlab-ca
         secret:
@@ -63,7 +38,7 @@ spec:
 {{- end }}
       containers:
       - name: gitlab-ce
-        image: gitlab-ce
+        image: "{{ .Values.gitlab.gitlab_image }}"
         ports:
         - containerPort: 22
           protocol: TCP
@@ -73,20 +48,19 @@ spec:
         - name: GITLAB_OMNIBUS_CONFIG
           value:
             root_pass='{{ $.Values.gitlab.root_password | default "kJ4e9qLkm4pOhQnbn7nE" }}';
-            external_url "https://{{ $.Values.gitlab_app_name }}.{{ include "tl500.app_domain" . }}";
+            external_url "https://{{ $.Values.gitlab.app_name }}.{{ include "tl500.app_domain" . }}";
             nginx['listen_port']=80;
             nginx['listen_https']=false;
-            gitlab_rails['initial_root_password']=root_pass;
+            gitlab_rails['initial_root_password']= '{{ $.Values.gitlab.root_password | default "kJ4e9qLkm4pOhQnbn7nE" }}';
             gitlab_rails['gitlab_port']=80;
             letsencrypt['enable'] = false;
             postgresql['enable']=false;
-            gitlab_rails['db_host'] = '{{ $.Values.gitlab_app_name }}-postgresql';
-            gitlab_rails['db_password']='{{ $db_pass }}';
-            gitlab_rails['db_username']='{{ $db_user }}';
-            gitlab_rails['db_database']='{{ .Values.gitlab.db_name | default "gitlabhq_production" }}';
+            gitlab_rails['db_host'] = '{{ $.Values.gitlab.app_name }}-postgresql';
+            gitlab_rails['db_password']='{{ .Values.gitlab.postgres.password }}';
+            gitlab_rails['db_username']='{{ .Values.gitlab.postgres.user }}';
+            gitlab_rails['db_database']='{{ .Values.gitlab.postgres.db_name | default "gitlabhq_production" }}';
             redis['enable'] = false; 
-            gitlab_rails['redis_host']='{{ $.Values.gitlab_app_name }}-redis';
-            unicorn['worker_processes'] = {{ .Values.gitlab.uni_workers | default 2 }}; 
+            gitlab_rails['redis_host']='{{ $.Values.gitlab.app_name }}-redis';
             manage_accounts['enable'] = true;
             manage_storage_directories['manage_etc'] = false; 
             gitlab_shell['auth_file'] = '/gitlab-data/ssh/authorized_keys';
@@ -101,8 +75,8 @@ spec:
             gitlab_rails['gitlab_signup_enabled'] = false;
         resources:
           limits:
-            cpu: '2'
-            memory: 6Gi
+            cpu: '4'
+            memory: 8Gi
           requests:
             cpu: 500m
             memory: 1Gi
@@ -120,7 +94,7 @@ spec:
             path: "/help"
             port: 80 
             scheme: HTTP
-          initialDelaySeconds: 120
+          initialDelaySeconds: 300
           timeoutSeconds: 1
           periodSeconds: 10
           successThreshold: 1
@@ -140,59 +114,35 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
-      serviceAccount: "{{ $.Values.gitlab_app_name }}-user"
+      serviceAccount: "{{ $.Values.gitlab.app_name }}-user"
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
-  name: "{{ $.Values.gitlab_app_name }}-redis"
+  name: "{{ $.Values.gitlab.app_name }}-redis"
   namespace: "{{ $.Values.gitlab.namespace }}"
   labels:
-    app: "{{ $.Values.gitlab_app_name }}"
+    app: "{{ $.Values.gitlab.app_name }}"
 spec:
   strategy:
     type: Recreate
-    recreateParams: {}
-    resources: {}
-  triggers:
-  - type: ConfigChange
-  - type: ImageChange
-    imageChangeParams:
-      automatic: true
-      containerNames:
-      - gitlab-ce-redis
-      from:
-        kind: ImageStreamTag
-        name: "{{ $.Values.gitlab_app_name }}-redis:5.0.4"
   replicas: 1
-  test: false
   selector:
-    app: "{{ $.Values.gitlab_app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab_app_name }}-redis"
+    matchLabels:
+      app: "{{ $.Values.gitlab.app_name }}"
   template:
     metadata:
       labels:
-        app: "{{ $.Values.gitlab_app_name }}"
-        deploymentconfig: "{{ $.Values.gitlab_app_name }}-redis"
+        app: "{{ $.Values.gitlab.app_name }}"
+        deployment: "{{ $.Values.gitlab.app_name }}-redis"
     spec:
-      {{- if .Values.runOnInfra }}
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      - effect: NoExecute
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      {{- end }}
       volumes:
       - name: gitlab-ce-volume-4
         persistentVolumeClaim:
-          claimName: "{{ $.Values.gitlab_app_name }}-redis-data"
+          claimName: "{{ $.Values.gitlab.app_name }}-redis-data"
       containers:
       - name: gitlab-ce-redis
-        image: gitlab-ce-redis
+        image: "{{ .Values.gitlab.redis_image }}"
         command:
         - "/bin/sh"
         - "-ec"
@@ -217,79 +167,33 @@ spec:
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
 ---
-kind: DeploymentConfig
-apiVersion: apps.openshift.io/v1
+kind: Deployment
+apiVersion: apps/v1
 metadata:
-  name: "{{ $.Values.gitlab_app_name }}-postgresql"
+  name: "{{ $.Values.gitlab.app_name }}-postgresql"
   namespace: "{{ $.Values.gitlab.namespace }}"
   labels:
-    app: "{{ $.Values.gitlab_app_name }}"
+    app: "{{ $.Values.gitlab.app_name }}"
 spec:
   strategy:
-    type: Recreate
-    # this doesn't work when on an infra node as the node selector is inherited from the Deploy bt the tollerations are not...
-    {{- if not .Values.runOnInfra }}
-    recreateParams:
-      post:
-        failurePolicy: Abort
-        execNewPod:
-          containerName: gitlab-ce-postgresql
-          command:
-          - "/usr/bin/scl"
-          - enable
-          - rh-postgresql96
-          - export PGPASSWORD='{{ $db_admin_pass }}'; psql -h '{{ $.Values.gitlab_app_name }}-postgresql'
-            -U postgres -d {{ .Values.gitlab.db_name | default "gitlabhq_production" }} -c 'CREATE EXTENSION IF NOT EXISTS
-            pg_trgm;'
-          env:
-          - name: HOME
-            value: "/var/lib/pgsql"
-          - name: PGDATA
-            value: "/var/lib/pgsql/data/userdata"
-          - name: CONTAINER_SCRIPTS_PATH
-            value: "/usr/share/container-scripts/postgresql"
-      {{- end }}
-    resources: {}
-  triggers:
-  - type: ConfigChange
-  - type: ImageChange
-    imageChangeParams:
-      automatic: true
-      containerNames:
-      - gitlab-ce-postgresql
-      from:
-        kind: ImageStreamTag
-        name: postgresql:latest
-        namespace: {{ .Values.gitlab.namespace }}
+    type: Recreate 
   replicas: 1
-  test: false
   selector:
-    app: "{{ $.Values.gitlab_app_name }}"
-    deploymentconfig: "{{ $.Values.gitlab_app_name }}-postgresql"
+    matchLabels:
+      app: "{{ $.Values.gitlab.app_name }}"
   template:
     metadata:
       labels:
-        app: "{{ $.Values.gitlab_app_name }}"
-        deploymentconfig: "{{ $.Values.gitlab_app_name }}-postgresql"
+        app: "{{ $.Values.gitlab.app_name }}"
+        deployment: "{{ $.Values.gitlab.app_name }}-postgresql"
     spec:
-      {{- if .Values.runOnInfra }}
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      - effect: NoExecute
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      {{- end }}
       volumes:
       - name: gitlab-ce-volume-3
         persistentVolumeClaim:
-          claimName: "{{ $.Values.gitlab_app_name }}-postgresql"
+          claimName: "{{ $.Values.gitlab.app_name }}-postgresql"
       containers:
       - name: gitlab-ce-postgresql
-        image: gitlab-ce-postgresql
+        image: "{{ .Values.gitlab.postgresql_image }}"
         ports:
         - containerPort: 5432
           protocol: TCP
@@ -301,7 +205,7 @@ spec:
             - "/bin/sh"
             - "-i"
             - "-c"
-            - psql -h 127.0.0.1 -U $POSTGRESQL_USER -q -d $POSTGRESQL_DATABASE -c
+            - psql -h 127.0.0.1 -U $POSTGRES_USER -q -d $POSTGRES_DB -c
               'SELECT 1'
         livenessProbe:
           timeoutSeconds: 1
@@ -309,14 +213,14 @@ spec:
           tcpSocket:
             port: 5432
         env:
-        - name: POSTGRESQL_USER
-          value: "{{ $db_user }}"
-        - name: POSTGRESQL_PASSWORD
-          value: "{{ $db_pass }}"
-        - name: POSTGRESQL_DATABASE
-          value: "{{ .Values.gitlab.db_name | default "gitlabhq_production" }}"
-        - name: POSTGRESQL_ADMIN_PASSWORD
-          value: "{{ $db_admin_pass }}"
+        - name: POSTGRES_USER
+          value: "{{ .Values.gitlab.postgres.user }}"
+        - name: POSTGRES_PASSWORD
+          value: "{{ .Values.gitlab.postgres.password }}"
+        - name: POSTGRES_DB
+          value: "{{ .Values.gitlab.postgres.db_name | default "gitlabhq_production" }}"
+        - name: PGDATA 
+          value: /var/lib/pgsql/data/userdata
         resources:
           limits:
             cpu: '1'
@@ -332,49 +236,50 @@ spec:
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
       dnsPolicy: ClusterFirst
-{{- if .Values.runOnInfra }}
----
-# job needs to be here otherwise the $db_admin_pass changes
-apiVersion: batch/v1
-kind: Job
-metadata:
-  name: configure-postgresql
-  namespace: "{{ $.Values.gitlab.namespace }}"
-spec:
-  template:
-    spec:
-      nodeSelector:
-        node-role.kubernetes.io/infra: ''
-      tolerations:
-      - effect: NoSchedule
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      - effect: NoExecute
-        key: node-role.kubernetes.io/infra
-        value: reserved
-      containers:
-      - command:
-          - /bin/bash
-          - -c
-          - |
-            echo "Patching the postgresql, waiting a mo for it to be up ..."
-            sleep 30
-            /usr/bin/scl enable rh-postgresql96
-            export PGPASSWORD='{{ $db_admin_pass }}'
-            psql -h '{{ $.Values.gitlab_app_name }}-postgresql' -U postgres -d {{ .Values.gitlab.db_name | default "gitlabhq_production" }} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
-            exit 0
-        image: "registry.redhat.io/rhscl/postgresql-96-rhel7:latest"
-        imagePullPolicy: IfNotPresent
-        name: job
-        env:
-          - name: HOME
-            value: "/var/lib/pgsql"
-          - name: PGDATA
-            value: "/var/lib/pgsql/data/userdata"
-          - name: CONTAINER_SCRIPTS_PATH
-            value: "/usr/share/container-scripts/postgresql"
-      dnsPolicy: ClusterFirst
-      restartPolicy: OnFailure
-      terminationGracePeriodSeconds: 10
-{{- end }}
-{{- end -}}
+# ---
+# # job needs to be here otherwise the $db_admin_pass changes
+# apiVersion: batch/v1
+# kind: Job
+# metadata:
+#   name: configure-postgresql
+#   namespace: "{{ $.Values.gitlab.namespace }}"
+#   labels:
+#     app.kubernetes.io/managed-by: {{ .Release.Service | quote }}
+#     app.kubernetes.io/instance: {{ .Release.Name | quote }}
+#     app.kubernetes.io/version: {{ .Chart.AppVersion }}
+#     helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+#   annotations:
+#     # This is what defines this resource as a hook. Without this line, the
+#     # job is considered part of the release.
+#     "helm.sh/hook": post-install,post-upgrade,post-rollback
+#     "helm.sh/hook-weight": "-5"
+#     "helm.sh/hook-delete-policy": hook-succeeded
+# spec:
+#   template:
+#     spec:
+#       containers:
+#       - command:
+#           - /bin/bash
+#           - -c
+#           - |
+#             echo "Patching the postgresql, waiting a mo for it to be up ..."
+#             sleep 30
+#             /usr/bin/scl enable rh-postgresql96
+#          export PGPASSWORD='{{/* $db_admin_pass */}}'
+#             psql -h '{{ $.Values.gitlab.app_name }}-postgresql' -U postgres -d {{ .Values.gitlab.db_name | default "gitlabhq_production" }} -c 'CREATE EXTENSION IF NOT EXISTS pg_trgm;'
+#             exit 0
+#         image: "registry.redhat.io/rhscl/postgresql-96-rhel7:latest"
+#         imagePullPolicy: IfNotPresent
+#         name: job
+#         env:
+#           - name: HOME
+#             value: "/var/lib/pgsql"
+#           - name: PGDATA
+#             value: "/var/lib/pgsql/data/userdata"
+#           - name: CONTAINER_SCRIPTS_PATH
+#             value: "/usr/share/container-scripts/postgresql"
+#       dnsPolicy: ClusterFirst
+#       restartPolicy: OnFailure
+#       terminationGracePeriodSeconds: 10
+# {{- end -}}
+# 

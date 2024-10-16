@@ -1,8 +1,11 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: minio-pvc
+  namespace: user{{ $attendee }}
 spec:
   accessModes:
     - ReadWriteOnce
@@ -15,6 +18,7 @@ kind: Secret
 apiVersion: v1
 metadata:
   name: minio-secret
+  namespace: user{{ $attendee }}
 stringData:
   # change the username and password to your own values.
   # ensure that the user is at least 3 characters long and the password at least 8
@@ -25,6 +29,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: minio
+  namespace: user{{ $attendee }}
 spec:
   replicas: 1
   selector:
@@ -109,6 +114,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: minio-service
+  namespace: user{{ $attendee }}
 spec:
   ipFamilies:
     - IPv4
@@ -132,6 +138,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: minio-api
+  namespace: user{{ $attendee }}
 spec:
   to:
     kind: Service
@@ -148,6 +155,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: minio-ui
+  namespace: user{{ $attendee }}
 spec:
   to:
     kind: Service
@@ -159,3 +167,4 @@ spec:
   tls:
     termination: edge
     insecureEdgeTerminationPolicy: Redirect
+{{- end }}

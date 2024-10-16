@@ -9,6 +9,6 @@ roleRef:
   name: system:openshift:scc:anyuid
 subjects:
 - kind: ServiceAccount
-  name: {{ .Values.gitlab_app_name }}-user
+  name: {{ .Values.gitlab.app_name }}-user
   namespace: {{ .Values.gitlab.namespace }}
 {{- end }}

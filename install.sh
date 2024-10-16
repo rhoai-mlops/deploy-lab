@@ -18,13 +18,14 @@ echo ${IPA_ADMIN_PASSWD} | kinit admin
 export GROUP_NAME=student
 ipa group-add \${GROUP_NAME} --desc "ML500 Student Group" || true
 # in a loop add random users to the group 
-for i in {1..24};do
+for i in {0..24};do
   export USER_NUMBER="user\$i"
   echo 'thisisthepassword' | ipa user-add \${USER_NUMBER} --first=\${USER_NUMBER} --last=\${USER_NUMBER} --email=\${USER_NUMBER}@redhatlabs.dev --password
   ipa group-add-member \${GROUP_NAME} --users=\$USER_NUMBER
   printf "\n\n User \${USER_NUMBER} is created"
 done
-  echo 'Passw0rd123' | ipa user-add ldap_admin --first=ldap_admin --last=ldap_admin --email=ldap_admin@redhatlabs.dev --password
+  echo 'Passw0rd' | ipa user-add ldap_admin --first=ldap_admin --last=ldap_admin --email=ldap_admin@redhatlabs.dev --password
+  ipa group-add-member \${GROUP_NAME} --users=ldap_admin
 EOF
 
 # Install Operators
