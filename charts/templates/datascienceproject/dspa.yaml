@@ -42,14 +42,14 @@ spec:
     externalStorage:
       basePath: ''
       bucket: pipeline
-      host: 'https://minio-api-user{{ $attendee }}.{{ $cluster_domain }}'
+      host: 'minio-api-user{{ $attendee }}.{{ $cluster_domain }}'
       port: ''
       region: wonderland
       s3CredentialsSecret:
         accessKey: AWS_ACCESS_KEY_ID
         secretKey: AWS_SECRET_ACCESS_KEY
         secretName: aws-connection-pipeline
-      scheme: http
+      scheme: https
   persistenceAgent:
     deploy: true
     numWorkers: 2
