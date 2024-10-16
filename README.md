@@ -7,7 +7,7 @@ This repository contains the components needed for the instructor to deploy the 
 
 1. Provide the number of attendees by updating `attendees` field in [values.yaml](charts/values.yaml).
 
-2. `helm upgrade --insall ml500-base . --namespace ml500 --create-namespace`
+2. `helm upgrade --install ml500-base . --namespace ml500 --create-namespace`
 
 OR
 
