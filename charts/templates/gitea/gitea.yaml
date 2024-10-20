@@ -1,0 +1,28 @@
+---
+apiVersion: pfe.rhpds.com/v1
+kind: Gitea
+metadata:
+  name: simple-gitea
+spec:
+  giteaImageTag: 1.20.0
+  giteaVolumeSize: 4Gi
+  giteaSsl: true
+  postgresqlVolumeSize: 4Gi
+  giteaAdminUser: opentlc-mgr
+  giteaAdminEmail: opentlc-mgr@redhat.com
+  giteaAdminPasswordSecretName: gitea-admin-password
+  giteaCreateUsers: true
+  giteaGenerateUserFormat: "user%d"
+  giteaUserNumber: {{ .Values.attendees }}
+  giteaUserPasswordSecretName: gitea-user-password
+  giteaMigrateRepositories: true
+  giteaRepositoriesList:
+  - repo: https://github.com/rhoai-mlops/jukebox.git
+    name: jukebox
+    private: false
+  - repo: https://github.com/rhoai-mlops/mlops-helmcharts.git
+    name: mlops-helmcharts
+    private: false
+  - repo: https://github.com/rhoai-mlops/mlops-gitops.git
+    name: mlops-gitops
+    private: false
