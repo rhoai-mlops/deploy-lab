@@ -11,7 +11,7 @@ gitlab:
   namespace: gitlab
   root_password: 7aydhn160bOrrsGEbnd172rE
   gitlab_image: gitlab/gitlab-ce:17.2.9-ce.0
-  redis_image: redis:5.0.4-alpine
+  redis_image: redis:7.4.1
   postgresql_image: postgres:17
   postgres:
     user: gitlab-ce 
