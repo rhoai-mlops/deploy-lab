@@ -6,3 +6,4 @@ minio:
   buckets:
     - name: pipeline
     - name: models
+
