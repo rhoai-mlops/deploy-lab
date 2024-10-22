@@ -1,6 +1,6 @@
 ---
 cluster_domain: apps.cluster-8gj46.dynamic.redhatworkshops.io
-attendees: 3
+attendees: 1
 
 minio:
   buckets:
