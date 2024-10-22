@@ -1,7 +1,0 @@
-trustyai:
-  devFlags:
-    manifests:
-      - contextDir: config
-        sourcePath: ''
-        uri: 'https://github.com/RHRolun/trustyai-service-operator/tarball/main'
-  managementState: Managed
