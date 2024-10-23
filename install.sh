@@ -18,8 +18,18 @@ helm upgrade --install ml500-base . --namespace ml500 --create-namespace
 
 oc patch --type=merge OAuth/cluster -p '{"spec": {"identityProviders": [{"name": "Students", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd-ml500"}}}, {"name": "htpasswd_provider", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd"}}}]}}'
 
-# Patch Argo CD to be cluster level (for the training purposes)
-
+# Patch Argo CD to be cluster level (for this training purposes)
+attendees=`grep attendees charts/values.yaml | cut -d':' -f2`
+for ((i=1; i<=$attendees; i++))
+do
+  if [ $i -eq 1 ]; then
+    NS="user$i-mlops"
+  else
+    NS="$var,user$i-mlops"
+  fi
+done
+oc -n openshift-gitops-operator patch subscriptions.operators.coreos.com/openshift-gitops-operator --type=json \
+        -p '[{"op":"'add'","path":"/spec/config", "value": {}},{"op":"'add'","path":"/spec/config/env", "value":[{"name": "DISABLE_DEFAULT_ARGOCD_INSTANCE", "value":"true"}] },{"op":"'add'","path":"/spec/config/env/1","value":{"name": "ARGOCD_CLUSTER_CONFIG_NAMESPACES", "value":"'${NS}'"}}]'
 
 # Configure TrustyAI
 oc patch ConfigMap/user-workload-monitoring-config  -p '{"data": {"config.yaml": "prometheus:\n  logLevel: debug\n  retention: 15d"}}' -n openshift-user-workload-monitoring
