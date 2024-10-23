@@ -1,0 +1,88 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: argocd-server
+    app.kubernetes.io/name: user{{ $attendee}}-mlops-gitops-argocd-server
+    app.kubernetes.io/part-of: user{{ $attendee}}
+  name: user{{ $attendee}}-mlops-gitops-argocd-server
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - delete  # supports deletion a live object in UI
+  - get     # supports viewing live object manifest in UI
+  - patch   # supports `argocd app patch`
+- apiGroups:
+  - ""
+  resources:
+  - events
+  verbs:
+  - list    # supports listing events in UI
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  - pods/log
+  verbs:
+  - get     # supports viewing pod logs from UI
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: argocd-server
+    app.kubernetes.io/name: user{{ $attendee}}-mlops-argocd-server
+    app.kubernetes.io/part-of: user{{ $attendee}}
+  name: user{{ $attendee}}-mlops-argocd-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: user{{ $attendee}}-mlops-gitops-argocd-server
+subjects:
+- kind: ServiceAccount
+  name: argocd-argocd-server
+  namespace: user{{ $attendee}}-mlops
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: user{{ $attendee}}-mlops-argocd-application-controller
+    app.kubernetes.io/part-of: user{{ $attendee}}-mlops
+  name: user{{ $attendee}}-mlops-argocd-application-controller
+rules:
+- apiGroups:
+  - '*'
+  resources:
+  - '*'
+  verbs:
+  - '*'
+- nonResourceURLs:
+  - '*'
+  verbs:
+  - '*'
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/component: application-controller
+    app.kubernetes.io/name: user{{ $attendee}}-mlops-argocd-application-controller
+    app.kubernetes.io/part-of: user{{ $attendee}}-mlops
+  name: user{{ $attendee}}-mlops-argocd-application-controller
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: user{{ $attendee}}-mlops-argocd-application-controller
+subjects:
+- kind: ServiceAccount
+  name: argocd-argocd-application-controller
+  namespace: user{{ $attendee}}-mlops
+{{- end }}

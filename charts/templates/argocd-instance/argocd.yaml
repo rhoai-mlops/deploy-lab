@@ -1,0 +1,60 @@
+{{ $cluster_domain := .Values.cluster_domain }}
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: argoproj.io/v1beta1
+kind: ArgoCD
+metadata:
+  name: argocd
+  labels:
+    app: argocd
+  namespace: user{{ $attendee}}-mlops
+spec:
+  # version: v2.10.5 # set this if you want the upstream containers instead
+  applicationSet: {}
+  notifications:
+    enabled: true
+  rbac:
+    defaultPolicy: 'role:admin'
+    policy: |
+      g, system:cluster-admins, role:admin
+    scopes: '[groups]'
+  resourceExclusions: |
+    - apiGroups:
+        - tekton.dev
+      clusters:
+        - '*'
+      kinds:
+        - TaskRun
+        - PipelineRun
+  server:
+    ingress:
+      enabled: false
+    route:
+      enabled: true
+      tls:
+        termination: reencrypt
+  sso:
+    dex:
+      openShiftOAuth: true
+    provider: dex
+  initialRepositories: |
+    - url: https://gitea-gitea.{{ $cluster_domain }}/user{{ $attendee}}/mlops-gitops.git
+      type: git
+      passwordSecret:
+        key: password
+        name: git-auth
+      usernameSecret:
+        key: username
+        name: git-auth
+      insecure: true
+    - url: https://gitea-gitea.{{ $cluster_domain }}/user{{ $attendee}}/mlops-helmcharts.git
+      type: git
+      passwordSecret:
+        key: password
+        name: git-auth
+      usernameSecret:
+        key: username
+        name: git-auth
+      insecure: true
+{{- end }}
