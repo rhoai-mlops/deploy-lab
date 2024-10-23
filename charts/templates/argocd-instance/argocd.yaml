@@ -11,6 +11,7 @@ metadata:
   namespace: user{{ $attendee}}-mlops
 spec:
   # version: v2.10.5 # set this if you want the upstream containers instead
+  applicationInstanceLabelKey: user{{ $attendee}}-mlops
   applicationSet: {}
   notifications:
     enabled: true
