@@ -1,6 +1,6 @@
 ---
-cluster_domain: apps.cluster-8gj46.dynamic.redhatworkshops.io
-attendees: 1
+cluster_domain: apps.cluster-75vtz.75vtz.sandbox1169.opentlc.com
+attendees: 8
 
 minio:
   buckets:
