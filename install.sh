@@ -25,7 +25,7 @@ do
   if [ $i -eq 1 ]; then
     NS="user$i-mlops"
   else
-    NS="$var,user$i-mlops"
+    NS+="$var,user$i-mlops"
   fi
 done
 oc -n openshift-gitops-operator patch subscriptions.operators.coreos.com/openshift-gitops-operator --type=json \
