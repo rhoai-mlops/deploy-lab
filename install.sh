@@ -37,12 +37,12 @@ oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components":
 
 #install model registry kustomize
 
-ATTENDEES=$(grep attendees ./charts/values.yaml)
-cd model-registry
-for I in $(seq 0 $((${ATTENDEES#*:}-1))) ; do 
-  export NAMESPACE=user${I}
-  KTEMP=$(mktemp -d)
-  cat kustomization.tmpl | envsubst > ${KTEMP}/kustomization.yaml
-  oc apply -k ${KTEMP}
-  rm -rf ${KTEMP}
-done
+# ATTENDEES=$(grep attendees ./charts/values.yaml)
+# cd model-registry
+# for I in $(seq 0 $((${ATTENDEES#*:}-1))) ; do 
+#   export NAMESPACE=user${I}
+#   KTEMP=$(mktemp -d)
+#   cat kustomization.tmpl | envsubst > ${KTEMP}/kustomization.yaml
+#   oc apply -k ${KTEMP}
+#   rm -rf ${KTEMP}
+# done
