@@ -55,7 +55,7 @@ spec:
     skipDBCreation: false
     username: root
   rest:
-    image: 'registry.redhat.io/rhoai/odh-model-registry-rhel8@sha256:8410d3ad4777424d965c77a45f772c168764736855c25ef9f725d9af38688787'
+    image: 'quay.io/opendatahub/model-registry:v0.2.10'
     port: 8080
     resources:
       limits:
