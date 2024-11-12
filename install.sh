@@ -34,15 +34,18 @@ oc -n openshift-gitops-operator patch subscriptions.operators.coreos.com/openshi
 # Configure TrustyAI
 oc patch ConfigMap/user-workload-monitoring-config  -p '{"data": {"config.yaml": "prometheus:\n  logLevel: debug\n  retention: 15d"}}' -n openshift-user-workload-monitoring
 oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components": {"trustyai": {"managementState": "Managed", "devFlags": {"manifests": [{"contextDir": "config", "sourcePath": "", "uri": "https://github.com/RHRolun/trustyai-service-operator/tarball/main"}]}}}}}'
+oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components": {"modelregistry": {"managementState": "Managed", "registriesNamespace": "rhoai-model-registries", "devFlags": {"manifests": [{"contextDir": "config", "sourcePath": "", "uri": "https://api.github.com/repos/opendatahub-io/model-registry-operator/tarball/v0.2.10"}]}}}}}'
+
+oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components": {"modelregistry": {"managementState": "Managed", "registriesNamespace": "rhoai-model-registries", "devFlags": {"manifests": [{"contextDir": "config", "sourcePath": "", "uri": "https://api.github.com/repos/opendatahub-io/model-registry-operator/tarball/v0.2.10"}]}}}}}'
 
 #install model registry kustomize
 
-ATTENDEES=$(grep attendees ./charts/values.yaml)
-cd model-registry
-for I in $(seq 0 $((${ATTENDEES#*:}-1))) ; do 
-  export NAMESPACE=user${I}
-  KTEMP=$(mktemp -d)
-  cat kustomization.tmpl | envsubst > ${KTEMP}/kustomization.yaml
-  oc apply -k ${KTEMP}
-  rm -rf ${KTEMP}
-done
+# ATTENDEES=$(grep attendees ./charts/values.yaml)
+# cd model-registry
+# for I in $(seq 0 $((${ATTENDEES#*:}-1))) ; do 
+#   export NAMESPACE=user${I}
+#   KTEMP=$(mktemp -d)
+#   cat kustomization.tmpl | envsubst > ${KTEMP}/kustomization.yaml
+#   oc apply -k ${KTEMP}
+#   rm -rf ${KTEMP}
+# done

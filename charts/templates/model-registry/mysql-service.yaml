@@ -1,0 +1,20 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: user{{ $attendee }}-registry-db
+  namespace: user{{ $attendee }}
+  labels:
+    component: db
+spec:
+  ports:
+    - name: dbapi
+      protocol: TCP
+      port: 3306
+      targetPort: 3306
+  type: ClusterIP
+  selector:
+    component: db
+{{- end }}

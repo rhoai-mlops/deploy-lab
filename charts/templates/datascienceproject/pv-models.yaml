@@ -1,0 +1,18 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: jukebox-model-pvc
+  namespace: user{{ $attendee }}
+  annotations:
+    volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
+spec:
+  resources:
+    requests:
+      storage: 3Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+{{- end }}
