@@ -1,4 +1,5 @@
 {{ $attendees := (.Values.attendees | int) }}
+{{ $buckets := .Values.minio.buckets }}
 {{- range $attendee := until $attendees }}
 ---
 apiVersion: v1
@@ -52,8 +53,8 @@ spec:
           echo -n "Waiting for minio pod in user{{ $attendee }} namespace"
           oc -n user{{ $attendee }} wait pod -l app=minio --for=condition=Ready --timeout=180s
           echo "Minio pod is running in user{{ $attendee }} namespace"
-          oc rsh `oc get pod -l app=minio -o name` mkdir /data/models
-          echo "🍒 models bucket is created."
-          oc rsh `oc get pod -l app=minio -o name` mkdir /data/pipeline
-          echo "🍒 pipeline bucket is created."
+          {{- range $bucket := $buckets }}
+          oc rsh `oc get pod -l app=minio -o name` mkdir /data/{{ $bucket.name  }}
+          echo "🍒 {{ $bucket.name }} bucket is created."
+          {{- end }}
 {{- end }}
