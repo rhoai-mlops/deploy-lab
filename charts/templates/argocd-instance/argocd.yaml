@@ -10,6 +10,7 @@ metadata:
     app: argocd
   namespace: user{{ $attendee}}-mlops
 spec:
+  resourceTrackingMethod: annotation+label
   # version: v2.10.5 # set this if you want the upstream containers instead
   applicationInstanceLabelKey: user{{ $attendee}}-mlops
   applicationSet: {}
