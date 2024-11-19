@@ -24,13 +24,11 @@ spec:
   resourceExclusions: |
     - apiGroups:
         - tekton.dev
-        - route.openshift.io
       clusters:
         - '*'
       kinds:
         - TaskRun
         - PipelineRun
-        - Route
   server:
     ingress:
       enabled: false
