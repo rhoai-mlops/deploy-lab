@@ -27,3 +27,6 @@ spec:
   - repo: https://github.com/rhoai-mlops/mlops-gitops.git
     name: mlops-gitops
     private: false
+  - repo: https://github.com/rhoai-mlops/jukebox-ui.git 
+    name: jukebox-ui
+    private: false
