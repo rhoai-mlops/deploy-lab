@@ -23,4 +23,4 @@ metadata:
   namespace: openshift-operators
 spec:
   daemonsetName: k8s-image-puller
-  images: 'ds=quay.io/modh/odh-generic-data-science-notebook@sha256:36454fcf796ea284b1e551469fa1705d64c4b2698a8bf9df82a84077989faf5e;vscode=quay.io/rhoai-mlops/custom-code-server:0.0.1'
+  images: 'ds=quay.io/modh/odh-generic-data-science-notebook@sha256:36454fcf796ea284b1e551469fa1705d64c4b2698a8bf9df82a84077989faf5e'
