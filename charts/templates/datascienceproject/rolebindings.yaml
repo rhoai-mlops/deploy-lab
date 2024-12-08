@@ -15,7 +15,7 @@ roleRef:
   kind: ClusterRole
   name: admin
 ---
-# to edit/view monotoring
+# to edit/view monitoring
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -28,4 +28,64 @@ subjects:
 - apiGroup: rbac.authorization.k8s.io
   kind: User
   name: user{{ $attendee }}
+---
+# to view logs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: view-application-logs
+  namespace: user{{ $attendee }}-test
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-logging-application-view
+subjects:
+- kind: User
+  name: user{{ $attendee }}
+  apiGroup: rbac.authorization.k8s.io
+---
+# to view logs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: view-application-logs
+  namespace: user{{ $attendee }}-prod
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-logging-application-view
+subjects:
+- kind: User
+  name: user{{ $attendee }}
+  apiGroup: rbac.authorization.k8s.io
+---
+# to view logs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: view-application-logs
+  namespace: user{{ $attendee }}-mlops
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-logging-application-view
+subjects:
+- kind: User
+  name: user{{ $attendee }}
+  apiGroup: rbac.authorization.k8s.io
+---
+# to view logs
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: view-application-logs
+  namespace: user{{ $attendee }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-logging-application-view
+subjects:
+- kind: User
+  name: user{{ $attendee }}
+  apiGroup: rbac.authorization.k8s.io
 {{- end }}
