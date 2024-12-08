@@ -1,0 +1,228 @@
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: minio-pvc
+  namespace: "openshift-logging"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  volumeMode: Filesystem
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: minio
+  namespace: "openshift-logging"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: minio-pvc
+      containers:
+        - resources:
+            limits:
+              cpu: 250m
+              memory: 1Gi
+            requests:
+              cpu: 20m
+              memory: 100Mi
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          terminationMessagePath: /dev/termination-log
+          name: minio
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: 30
+            timeoutSeconds: 1
+            periodSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: minio_root_user
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secret
+                  key: minio_root_password
+          ports:
+            - containerPort: 9000
+              protocol: TCP
+            - containerPort: 9090
+              protocol: TCP
+          imagePullPolicy: IfNotPresent
+          volumeMounts:
+            - name: data
+              mountPath: /data
+              subPath: minio
+          terminationMessagePolicy: File
+          image: >-
+            quay.io/minio/minio:RELEASE.2024-06-29T01-20-47Z
+          args:
+            - server
+            - /data
+            - --console-address
+            - :9090
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      securityContext: {}
+      schedulerName: default-scheduler
+  strategy:
+    type: Recreate
+  revisionHistoryLimit: 10
+  progressDeadlineSeconds: 600
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: minio-ui
+  namespace: "openshift-logging"
+spec:
+  to:
+    kind: Service
+    name: minio-service
+    weight: 100
+  port:
+    targetPort: ui
+  wildcardPolicy: None
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+# ---
+# kind: Route
+# apiVersion: route.openshift.io/v1
+# metadata:
+#   name: minio-api
+#   namespace: "openshift-logging"
+# spec:
+#   to:
+#     kind: Service
+#     name: minio-service
+#     weight: 100
+#   port:
+#     targetPort: api
+#   wildcardPolicy: None
+#   tls:
+#     termination: edge
+#     insecureEdgeTerminationPolicy: Redirect
+---
+---
+kind: Secret
+apiVersion: v1
+metadata:
+  name: minio-secret
+  namespace: "openshift-logging"
+stringData:
+  minio_root_user: minio
+  minio_root_password: IJrixDGbADAkgey5
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: minio-service
+  namespace: "openshift-logging"
+spec:
+  ipFamilies:
+    - IPv4
+  ports:
+    - name: api
+      protocol: TCP
+      port: 9000
+      targetPort: 9000
+    - name: ui
+      protocol: TCP
+      port: 9090
+      targetPort: 9090
+  internalTrafficPolicy: Cluster
+  type: ClusterIP
+  ipFamilyPolicy: SingleStack
+  sessionAffinity: None
+  selector:
+    app: minio
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: create-bucket-cr
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+  - list
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: create-bucket-crb
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: create-bucket-cr
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: openshift-logging
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-bucket
+  namespace: openshift-logging
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: Never
+      serviceAccount: default
+      serviceAccountName: default
+      containers:
+      - name: job
+        image: "quay.io/openshift/origin-cli:latest"
+        imagePullPolicy: IfNotPresent
+        command:
+          - /bin/bash
+          - -c
+          - | # create bucket
+            oc -n openshift-logging wait pod --for=condition=Ready -l app=minio
+            curl -o /tmp/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+            chmod +x /tmp/mc
+            /tmp/mc --config-dir /tmp/ alias set myminio http://minio-service.openshift-logging.svc.cluster.local:9000 minio IJrixDGbADAkgey5
+            /tmp/mc --config-dir /tmp/ mb myminio/loki
