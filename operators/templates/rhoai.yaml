@@ -5,9 +5,8 @@ metadata:
   name: rhods-operator
   namespace: redhat-ods-operator
 spec:
-  channel: fast
+  channel: stable-2.16
   installPlanApproval: Automatic
   name: rhods-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: rhods-operator.2.15.0

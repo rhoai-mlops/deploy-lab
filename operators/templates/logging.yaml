@@ -13,7 +13,6 @@ spec:
   name: cluster-logging
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: cluster-logging.v6.1.0
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -28,7 +27,6 @@ spec:
   name: cluster-observability-operator
   source: redhat-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: cluster-observability-operator.0.4.1
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -42,6 +40,4 @@ spec:
   installPlanApproval: Automatic
   name: loki-operator
   source: redhat-operators
-  sourceNamespace: openshift-marketplace
-  startingCSV: loki-operator.v6.1.0
-  
+  sourceNamespace: openshift-marketplace  
