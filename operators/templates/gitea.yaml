@@ -1,11 +1,36 @@
 ---
 apiVersion: operators.coreos.com/v1alpha1
+kind: CatalogSource
+metadata:
+  name: redhat-rhpds-gitea
+  namespace: gitea-operator
+spec:
+  sourceType: grpc
+  image: quay.io/rhpds/gitea-catalog:latest
+  displayName: Red Hat Demo Platform (Gitea)
+  publisher: Red Hat Demo Platform
+---
+apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
 metadata:
   name: gitea-operator
+  namespace: gitea-operator
 spec:
   channel: stable
   installPlanApproval: Automatic
   name: gitea-operator
   source: redhat-rhpds-gitea
   sourceNamespace: gitea-operator
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gitea-operator
+---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: gitea-operator
+  namespace: gitea-operator
+spec:
+  targetNamespaces: []
