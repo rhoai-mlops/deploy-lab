@@ -12,6 +12,7 @@ metadata:
   annotations:
     openshift.io/description: 'user{{ $attendee}} MLOps Project'
     openshift.io/display-name: user{{ $attendee}}-mlops
+    openshift.io/requester: user{{ $attendee}}
 spec:
   finalizers:
     - kubernetes

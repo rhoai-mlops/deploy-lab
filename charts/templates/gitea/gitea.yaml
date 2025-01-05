@@ -20,13 +20,13 @@ spec:
   giteaRepositoriesList:
   - repo: https://github.com/rhoai-mlops/jukebox.git
     name: jukebox
-    private: false
+    private: true
   - repo: https://github.com/rhoai-mlops/mlops-helmcharts.git
     name: mlops-helmcharts
-    private: false
+    private: true
   - repo: https://github.com/rhoai-mlops/mlops-gitops.git
     name: mlops-gitops
-    private: false
+    private: true
   - repo: https://github.com/rhoai-mlops/jukebox-ui.git 
     name: jukebox-ui
-    private: false
+    private: true

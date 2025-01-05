@@ -12,6 +12,7 @@ metadata:
   annotations:
     openshift.io/description: 'user{{ $attendee}} Data Science Project'
     openshift.io/display-name: user{{ $attendee}}
+    openshift.io/requester: user{{ $attendee}}
 spec:
   finalizers:
     - kubernetes
