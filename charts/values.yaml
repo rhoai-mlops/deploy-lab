@@ -1,5 +1,5 @@
 ---
-cluster_domain: apps.cluster-qc5mb.qc5mb.sandbox706.opentlc.com
+cluster_domain: apps.cluster-abc.com
 attendees: 15
 
 minio:
@@ -7,4 +7,5 @@ minio:
     - name: pipeline
     - name: models
     - name: data
+    - name: data-cache
 
