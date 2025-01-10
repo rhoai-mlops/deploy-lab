@@ -1,0 +1,18 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: feast
+  namespace: user{{ $attendee }}
+  labels:
+    app: mlops-feature-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
