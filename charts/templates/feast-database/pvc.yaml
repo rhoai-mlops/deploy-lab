@@ -7,7 +7,7 @@ metadata:
   name: feast
   namespace: user{{ $attendee }}
   labels:
-    app: mlops-feature-store
+    app: feature-store
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 spec:

@@ -4,17 +4,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mlops-feature-store
+  name: feature-store
   namespace: user{{ $attendee }}
 spec:
   selector:
     matchLabels:
-      app: mlops-feature-store
+      app: feature-store
   replicas: 1
   template:
     metadata:
       labels:
-        app: mlops-feature-store
+        app: feature-store
     spec:
       containers:
         - name: postgresql
