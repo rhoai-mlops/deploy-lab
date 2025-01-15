@@ -2,7 +2,7 @@
 {{ $attendees := (.Values.attendees | int) }}
 {{- range $attendee := until $attendees }}
 ---
-apiVersion: datasciencepipelinesapplications.opendatahub.io/v1alpha1
+apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
 kind: DataSciencePipelinesApplication
 metadata:
   annotations:
