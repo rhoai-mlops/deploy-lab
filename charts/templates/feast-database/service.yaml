@@ -1,0 +1,22 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: feast
+  namespace: user{{ $attendee }}
+  labels:
+    app: feature-store
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  ports:
+  - name: postgresql
+    protocol: TCP
+    port: 5432
+    targetPort: 5432
+  selector:
+    app: feature-store
+  sessionAffinity: None
+  type: ClusterIP
