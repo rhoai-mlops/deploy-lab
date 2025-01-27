@@ -75,3 +75,4 @@ spec:
             claimName: feast
   strategy:
     type: Recreate
+{{- end }}

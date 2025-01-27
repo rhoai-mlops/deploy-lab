@@ -8,26 +8,18 @@ metadata:
   annotations:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-weight": "3"
-  finalizers:
-    - datasciencepipelinesapplications.opendatahub.io/finalizer
   name: dspa
   namespace: user{{ $attendee }}
+  finalizers:
+    - datasciencepipelinesapplications.opendatahub.io/finalizer
 spec:
   apiServer:
+    artifactSignedURLExpirySeconds: 60
     caBundleFileMountPath: ''
-    stripEOF: true
-    dbConfigConMaxLifetimeSec: 120
-    applyTektonCustomResource: true
     caBundleFileName: ''
     deploy: true
-    enableSamplePipeline: false
-    autoUpdatePipelineDefaultVersion: true
-    archiveLogs: false
-    terminateStatus: Cancelled
     enableOauth: true
-    trackArtifacts: true
-    collectMetrics: true
-    injectDefaultScript: true
+    enableSamplePipeline: false
   database:
     disableHealthCheck: false
     mariaDB:
@@ -53,6 +45,7 @@ spec:
   persistenceAgent:
     deploy: true
     numWorkers: 2
+  podToPodTLS: true
   scheduledWorkflow:
     cronScheduleTimezone: UTC
     deploy: true
