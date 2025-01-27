@@ -20,3 +20,4 @@ spec:
     app: feature-store
   sessionAffinity: None
   type: ClusterIP
+{{- end }}
