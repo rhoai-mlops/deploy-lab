@@ -1,0 +1,16 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+apiVersion: helm.openshift.io/v1
+kind: HelmChart
+metadata:
+  name: feast-feature-server-user{{ $attendee }}
+  namespace: user{{ $attendee }}
+spec:
+  repo: {{ $.Values.feastFeatureServer.repo }}
+  chart: {{ $.Values.feastFeatureServer.chart }}
+  version: {{ $.Values.feastFeatureServer.version }}
+  targetNamespace: user{{ $attendee }}
+  valuesContent: |-
+    {{- toYaml $.Values.feastFeatureServer.values | nindent 4 }}
+{{- end }}
