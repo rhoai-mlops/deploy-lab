@@ -7,4 +7,3 @@ minio:
     - name: pipeline
     - name: models
     - name: data
-    - name: data-cache
