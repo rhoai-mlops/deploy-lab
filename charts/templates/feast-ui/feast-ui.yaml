@@ -1,0 +1,99 @@
+{{ $attendees := (.Values.attendees | int) }}
+{{- range $attendee := until $attendees }}
+---
+# Source: feast-feature-server/templates/service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: feast-ui-feast-feature-server
+  namespace: user{{ $attendee }}
+  labels:
+    helm.sh/chart: feast-feature-server-0.40.1
+    app.kubernetes.io/name: feast-feature-server
+    app.kubernetes.io/instance: feast
+    app.kubernetes.io/managed-by: Helm
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: ui
+      protocol: TCP
+      name: http
+  selector:
+    app.kubernetes.io/name: feast-feature-server
+    app.kubernetes.io/instance: feast
+---
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: feast-ui
+  namespace: user{{ $attendee }}
+spec:
+  path: /
+  to:
+    kind: Service
+    name: feast-ui-feast-feature-server
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  wildcardPolicy: None
+---
+# Source: feast-feature-server/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: feast-ui-feast-feature-server
+  namespace: user{{ $attendee }}
+  labels:
+    helm.sh/chart: feast-feature-server-0.40.1
+    app.kubernetes.io/name: feast-feature-server
+    app.kubernetes.io/instance: feast
+    app.kubernetes.io/managed-by: Helm
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: feast-feature-server
+      app.kubernetes.io/instance: feast
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: feast-feature-server
+        app.kubernetes.io/instance: feast
+    spec:
+      securityContext:
+        {}
+      containers:
+        - name: feast-feature-server
+          securityContext:
+            {}
+          image: "feastdev/feature-server:0.40.1"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: FEATURE_STORE_YAML_BASE64
+              value: cHJvamVjdDogbXVzaWMKcHJvdmlkZXI6IGxvY2FsCnJlZ2lzdHJ5OgogICAgcmVnaXN0cnlfdHlwZTogc3FsCiAgICBwYXRoOiBwb3N0Z3Jlc3FsOi8vZmVhc3Q6ZmVhc3RAZmVhc3Q6NTQzMi9mZWFzdAogICAgY2FjaGVfdHRsX3NlY29uZHM6IDYwCiAgICBzcWxhbGNoZW15X2NvbmZpZ19rd2FyZ3M6CiAgICAgICAgZWNobzogZmFsc2UKICAgICAgICBwb29sX3ByZV9waW5nOiB0cnVlCm9ubGluZV9zdG9yZToKICAgIHR5cGU6IHBvc3RncmVzCiAgICBob3N0OiBmZWFzdAogICAgcG9ydDogNTQzMgogICAgZGF0YWJhc2U6IGZlYXN0CiAgICBkYl9zY2hlbWE6IGZlYXN0CiAgICB1c2VyOiBmZWFzdAogICAgcGFzc3dvcmQ6IGZlYXN0Cm9mZmxpbmVfc3RvcmU6CiAgICB0eXBlOiBmaWxlCmVudGl0eV9rZXlfc2VyaWFsaXphdGlvbl92ZXJzaW9uOiAyCg==
+          command:
+            - "feast"
+            - "ui"
+            - "-h"
+            - "0.0.0.0"
+          ports:
+            - name: ui
+              containerPort: 8888
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: ui
+            initialDelaySeconds: 30
+            periodSeconds: 30
+          readinessProbe:
+            tcpSocket:
+              port: ui
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          resources:
+            {}
+{{- end }}

@@ -8,4 +8,3 @@ minio:
     - name: models
     - name: data
     - name: data-cache
-
