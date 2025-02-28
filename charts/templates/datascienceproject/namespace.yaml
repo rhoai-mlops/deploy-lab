@@ -9,6 +9,8 @@ metadata:
     kubernetes.io/metadata.name: user{{ $attendee}}
     opendatahub.io/dashboard: 'true'
     openshift-pipelines.tekton.dev/namespace-reconcile-version: 1.15.1
+    maistra.io/member-of: istio-system
+    modelmesh-enabled: 'false'
   annotations:
     openshift.io/description: 'user{{ $attendee}} Data Science Project'
     openshift.io/display-name: user{{ $attendee}}
