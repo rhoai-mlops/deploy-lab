@@ -5,7 +5,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: user{{ $attendee }}-registry-db
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   labels:
     component: db
 spec:

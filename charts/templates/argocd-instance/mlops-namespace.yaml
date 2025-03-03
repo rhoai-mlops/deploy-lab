@@ -4,14 +4,13 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: user{{ $attendee}}-mlops
+  name: user{{ $attendee}}-toolings
   labels:
-    kubernetes.io/metadata.name: user{{ $attendee}}-mlops
+    kubernetes.io/metadata.name: user{{ $attendee}}-toolings
     opendatahub.io/dashboard: 'true'
-    openshift-pipelines.tekton.dev/namespace-reconcile-version: 1.15.1
   annotations:
-    openshift.io/description: 'user{{ $attendee}} MLOps Project'
-    openshift.io/display-name: user{{ $attendee}}-mlops
+    openshift.io/description: 'user{{ $attendee}} MLOps Toolings Project'
+    openshift.io/display-name: user{{ $attendee}}-toolings
     openshift.io/requester: user{{ $attendee}}
 spec:
   finalizers:

@@ -5,7 +5,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: user{{ $attendee }}-registry-db-parameters
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
 data:
   MYSQL_ALLOW_EMPTY_PASSWORD: 'true'
   MYSQL_DATABASE: metadb
