@@ -20,7 +20,7 @@ kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: admin
-  namespace: user{{ $attendee }}-mlops
+  namespace: user{{ $attendee }}-toolings
 subjects:
   - kind: User
     apiGroup: rbac.authorization.k8s.io
