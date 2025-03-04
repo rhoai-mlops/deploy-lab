@@ -4,16 +4,16 @@
 kind: Namespace
 apiVersion: v1
 metadata:
-  name: user{{ $attendee}}
+  name: user{{ $attendee}}-jukebox
   labels:
-    kubernetes.io/metadata.name: user{{ $attendee}}
+    kubernetes.io/metadata.name: user{{ $attendee}}-jukebox
     opendatahub.io/dashboard: 'true'
     openshift-pipelines.tekton.dev/namespace-reconcile-version: 1.15.1
     maistra.io/member-of: istio-system
     modelmesh-enabled: 'false'
   annotations:
-    openshift.io/description: 'user{{ $attendee}} Data Science Project'
-    openshift.io/display-name: user{{ $attendee}}
+    openshift.io/description: 'user{{ $attendee}} Jukebox Experiment Environment'
+    openshift.io/display-name: user{{ $attendee}}-jukebox
     openshift.io/requester: user{{ $attendee }}
 spec:
   finalizers:

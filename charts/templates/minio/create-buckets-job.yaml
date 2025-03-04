@@ -6,7 +6,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: minio-manage
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 ---
@@ -14,7 +14,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: minio-manage-rb
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   annotations:
     argocd.argoproj.io/sync-wave: "1"
 roleRef:
@@ -24,13 +24,13 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: minio-manage
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
 ---
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: create-buckets
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   annotations:
     argocd.argoproj.io/sync-wave: "3"
     argocd.argoproj.io/hook: Sync
@@ -50,9 +50,9 @@ spec:
         - /bin/bash
         - -c
         - |
-          echo -n "Waiting for minio pod in user{{ $attendee }} namespace"
-          oc -n user{{ $attendee }} wait pod -l app=minio --for=condition=Ready --timeout=180s
-          echo "Minio pod is running in user{{ $attendee }} namespace"
+          echo -n "Waiting for minio pod in user{{ $attendee }}-jukebox namespace"
+          oc -n user{{ $attendee }}-jukebox wait pod -l app=minio --for=condition=Ready --timeout=180s
+          echo "Minio pod is running in user{{ $attendee }}-jukebox namespace"
           {{- range $bucket := $buckets }}
           oc rsh `oc get pod -l app=minio -o name` mkdir /data/{{ $bucket.name  }}
           echo "🍒 {{ $bucket.name }} bucket is created."

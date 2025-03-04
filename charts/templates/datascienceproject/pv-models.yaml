@@ -5,7 +5,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: jukebox-model-pvc
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   annotations:
     volume.beta.kubernetes.io/storage-provisioner: kubernetes.io/aws-ebs
 spec:

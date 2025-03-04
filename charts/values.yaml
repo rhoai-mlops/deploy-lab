@@ -1,6 +1,6 @@
 ---
-cluster_domain: apps.cluster-abc.com
-attendees: 15
+cluster_domain: .apps.abc.opentlc.com
+attendees: 6
 
 minio:
   buckets:
