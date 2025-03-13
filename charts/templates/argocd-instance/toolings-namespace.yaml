@@ -29,4 +29,34 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
   name: admin
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: user{{ $attendee}}-test
+  labels:
+    kubernetes.io/metadata.name: user{{ $attendee}}-test
+    opendatahub.io/dashboard: 'true'
+    argocd.argoproj.io/managed-by: user{{ $attendee}}-toolings
+  annotations:
+    openshift.io/description: 'user{{ $attendee}} Test Project'
+    openshift.io/display-name: user{{ $attendee}}-test
+spec:
+  finalizers:
+    - kubernetes
+---
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: user{{ $attendee}}-prod
+  labels:
+    kubernetes.io/metadata.name: user{{ $attendee}}-prod
+    opendatahub.io/dashboard: 'true'
+    argocd.argoproj.io/managed-by: user{{ $attendee}}-toolings
+  annotations:
+    openshift.io/description: 'user{{ $attendee}} Prod Project'
+    openshift.io/display-name: user{{ $attendee}}-prod
+spec:
+  finalizers:
+    - kubernetes
 {{- end }}
