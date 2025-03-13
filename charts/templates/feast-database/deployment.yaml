@@ -5,7 +5,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: feature-store
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
 spec:
   selector:
     matchLabels:

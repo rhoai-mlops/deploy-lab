@@ -7,7 +7,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: aws-connection-{{ $bucket.name }}
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   labels:
     opendatahub.io/dashboard: "true"
     opendatahub.io/managed: "true"
@@ -19,7 +19,7 @@ stringData:
   AWS_ACCESS_KEY_ID: user{{ $attendee }}
   AWS_SECRET_ACCESS_KEY: thisisthepassword
   AWS_DEFAULT_REGION: wonderland
-  AWS_S3_ENDPOINT: https://minio-api-user{{ $attendee }}.{{ $cluster_domain }}
+  AWS_S3_ENDPOINT: https://minio-api-user{{ $attendee }}-jukebox.{{ $cluster_domain }}
   AWS_S3_BUCKET: {{ $bucket.name }}
 {{- end }}
 {{- end }}

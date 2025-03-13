@@ -47,7 +47,7 @@ spec:
     tlsMode: ISTIO_MUTUAL
   mysql:
     database: metadb
-    host: user{{ $attendee }}-registry-db.user{{ $attendee }}.svc.cluster.local
+    host: user{{ $attendee }}-registry-db.user{{ $attendee }}-jukebox.svc.cluster.local
     passwordSecret:
       key: database-password
       name: user{{ $attendee }}-registry-db

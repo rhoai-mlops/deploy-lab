@@ -5,7 +5,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: metadata-mysql
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
 spec:
   accessModes:
     - ReadWriteOnce
