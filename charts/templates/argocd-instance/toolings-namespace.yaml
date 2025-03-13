@@ -38,6 +38,8 @@ metadata:
     kubernetes.io/metadata.name: user{{ $attendee}}-test
     opendatahub.io/dashboard: 'true'
     argocd.argoproj.io/managed-by: user{{ $attendee}}-toolings
+    maistra.io/member-of: istio-system
+    modelmesh-enabled: 'false'
   annotations:
     openshift.io/description: 'user{{ $attendee}} Test Project'
     openshift.io/display-name: user{{ $attendee}}-test
@@ -53,6 +55,8 @@ metadata:
     kubernetes.io/metadata.name: user{{ $attendee}}-prod
     opendatahub.io/dashboard: 'true'
     argocd.argoproj.io/managed-by: user{{ $attendee}}-toolings
+    maistra.io/member-of: istio-system
+    modelmesh-enabled: 'false'
   annotations:
     openshift.io/description: 'user{{ $attendee}} Prod Project'
     openshift.io/display-name: user{{ $attendee}}-prod
