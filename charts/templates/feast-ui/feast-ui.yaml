@@ -6,7 +6,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: feast-ui-feast-feature-server
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   labels:
     helm.sh/chart: feast-feature-server-0.40.1
     app.kubernetes.io/name: feast-feature-server
@@ -27,7 +27,7 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: feast-ui
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
 spec:
   path: /
   to:
@@ -46,7 +46,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: feast-ui-feast-feature-server
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   labels:
     helm.sh/chart: feast-feature-server-0.40.1
     app.kubernetes.io/name: feast-feature-server

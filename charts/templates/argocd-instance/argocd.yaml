@@ -8,10 +8,10 @@ metadata:
   name: argocd
   labels:
     app: argocd
-  namespace: user{{ $attendee}}-mlops
+  namespace: user{{ $attendee}}-toolings
 spec:
   # version: v2.10.5 # set this if you want the upstream containers instead
-  applicationInstanceLabelKey: user{{ $attendee}}-mlops
+  applicationInstanceLabelKey: user{{ $attendee}}-toolings
   resourceTrackingMethod: annotation
   applicationSet: {}
   notifications:

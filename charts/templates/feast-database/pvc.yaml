@@ -5,7 +5,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: feast
-  namespace: user{{ $attendee }}
+  namespace: user{{ $attendee }}-jukebox
   labels:
     app: feature-store
   annotations:
