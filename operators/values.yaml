@@ -4,7 +4,7 @@ sealed-secrets:
   enabled: true
   nameOverride: sealed-secrets
   fullnameOverride: sealed-secrets
-  namespace: ml500
+  namespace: sealed-secrets
   # Dont touch the security context values, deployment will fail in OpenShift otherwise.
   podSecurityContext:
     enabled: false
