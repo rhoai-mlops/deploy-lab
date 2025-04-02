@@ -1,1 +1,14 @@
 ---
+sealed-secrets:
+  # Disabled by default
+  enabled: true
+  nameOverride: sealed-secrets
+  fullnameOverride: sealed-secrets
+  namespace: sealed-secrets
+  # Dont touch the security context values, deployment will fail in OpenShift otherwise.
+  podSecurityContext:
+    enabled: false
+  containerSecurityContext:
+    enabled: false
+  args:
+    - "--update-status=true"
