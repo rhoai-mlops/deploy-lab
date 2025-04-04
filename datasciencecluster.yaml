@@ -25,7 +25,11 @@ spec:
       managementState: Managed
       registriesNamespace: rhoai-model-registries
     trustyai:
-      managementState: Managed
+      devFlags:
+        manifests:
+          - contextDir: config
+            sourcePath: ''
+            uri: 'https://api.github.com/repos/ckavili/trustyai-service-operator-ci/tarball/service-acca8f52f3f163444b2fc68003af5cae13f04762'
     ray:
       managementState: Managed
     kueue:
