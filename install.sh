@@ -16,12 +16,12 @@ oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components":
 
 # Make ArgoCD cluster wide
 attendees=`grep attendees charts/values.yaml | cut -d':' -f2`
- for ((i=1; i<=$attendees; i++))
+ for ((i=0; i<=$attendees; i++))
  do
    if [ $i -eq 1 ]; then
-     NS="user$i-mlops"
+     NS="user$i-toolings"
    else
-     NS+="$var,user$i-mlops"
+     NS+="$var,user$i-toolings"
    fi
  done
  oc -n openshift-gitops-operator patch subscriptions.operators.coreos.com/openshift-gitops-operator --type=json \
