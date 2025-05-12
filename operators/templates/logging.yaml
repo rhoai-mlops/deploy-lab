@@ -4,6 +4,14 @@ kind: Namespace
 metadata:
   name: openshift-logging
 ---
+apiVersion: operators.coreos.com/v1
+kind: OperatorGroup
+metadata:
+  name: openshift-logging
+  namespace: openshift-logging
+spec:
+  upgradeStrategy: Default
+---
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -17,8 +25,6 @@ metadata:
   generation: 1
   labels:
     operators.coreos.com/cluster-logging.openshift-logging: ''
-  annotations:
-    "helm.sh/hook-weight": "5"
   name: cluster-logging
   namespace: openshift-logging
 spec:
@@ -33,8 +39,6 @@ kind: Subscription
 metadata:
   labels:
     operators.coreos.com/cluster-observability-operator.openshift-operators: ''
-  annotations:
-    "helm.sh/hook-weight": "3"
   name: cluster-observability-operator
   namespace: openshift-operators
 spec:
@@ -49,8 +53,6 @@ kind: Subscription
 metadata:
   labels:
     operators.coreos.com/loki-operator.openshift-operators-redhat: ''
-  annotations:
-    "helm.sh/hook-weight": "5"
   name: loki-operator
   namespace: openshift-operators-redhat
 spec:
