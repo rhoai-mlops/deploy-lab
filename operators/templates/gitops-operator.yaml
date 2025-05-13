@@ -7,8 +7,6 @@ metadata:
     openshift.io/display-name: "OpenShift GitOps Operator"
   labels:
     openshift.io/cluster-monitoring: 'true'
-    # meta.helm.sh/release-name: "ml500-gitops"
-    # app.kubernetes.io/managed-by: "Helm"
 ---
 apiVersion: operators.coreos.com/v1alpha1
 kind: Subscription
@@ -23,8 +21,8 @@ spec:
   sourceNamespace: openshift-marketplace
   config:
     env:
-      - name: ARGOCD_CLUSTER_CONFIG_NAMESPACES
-        value: "openshift-gitops"
+      - name: DISABLE_DEFAULT_ARGOCD_INSTANCE
+        value: "true"
 ---
 apiVersion: operators.coreos.com/v1
 kind: OperatorGroup
