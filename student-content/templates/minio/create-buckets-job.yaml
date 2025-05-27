@@ -1,6 +1,6 @@
-{{ $attendees := (.Values.attendees | int) }}
+{{ $attendees := (add1 .Values.attendees | int) }}
 {{ $buckets := .Values.minio.buckets }}
-{{- range $attendee := until $attendees }}
+{{- range $attendee := untilStep 1 $attendees 1 }}
 ---
 apiVersion: v1
 kind: ServiceAccount

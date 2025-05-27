@@ -13,8 +13,12 @@ spec:
   giteaAdminEmail: opentlc-mgr@redhat.com
   giteaAdminPasswordSecretName: gitea-admin-password
   giteaCreateUsers: true
+  {{- if eq (int .Values.attendees) 1 }}
+  giteaGenerateUserFormat: "user1"
+  {{- else}}
   giteaGenerateUserFormat: "user%d"
   giteaUserNumber: {{ .Values.attendees }}
+  {{- end }}
   giteaUserPasswordSecretName: gitea-user-password
   giteaMigrateRepositories: true
   giteaRepositoriesList:
