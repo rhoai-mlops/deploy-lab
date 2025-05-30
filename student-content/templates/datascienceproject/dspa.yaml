@@ -1,6 +1,6 @@
 {{ $cluster_domain := .Values.cluster_domain }}
-{{ $attendees := (.Values.attendees | int) }}
-{{- range $attendee := until $attendees }}
+{{ $attendees := (add1 .Values.attendees | int) }}
+{{- range $attendee := untilStep 1 $attendees 1 }}
 ---
 apiVersion: datasciencepipelinesapplications.opendatahub.io/v1
 kind: DataSciencePipelinesApplication

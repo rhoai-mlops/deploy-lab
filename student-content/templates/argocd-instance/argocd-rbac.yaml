@@ -1,5 +1,5 @@
-{{ $attendees := (.Values.attendees | int) }}
-{{- range $attendee := until $attendees }}
+{{ $attendees := (add1 .Values.attendees | int) }}
+{{- range $attendee := untilStep 1 $attendees 1 }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
