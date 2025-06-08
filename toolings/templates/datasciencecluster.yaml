@@ -15,9 +15,12 @@ spec:
       managementState: Managed
     kserve:
       managementState: Managed
+      defaultDeploymentMode: Serverless
+      RawDeploymentServiceConfig: Headed
       serving:
         ingressGateway:
           certificate:
+            secretName: knative-serving-cert
             type: OpenshiftDefaultIngress
         managementState: Managed
         name: knative-serving
