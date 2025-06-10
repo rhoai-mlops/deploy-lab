@@ -6,7 +6,7 @@ apiVersion: modelregistry.opendatahub.io/v1alpha1
 kind: ModelRegistry
 metadata:
   annotations:
-    openshift.io/description: ''
+    openshift.io/description: 'user{{ $attendee }} Model Registry'
     openshift.io/display-name: user{{ $attendee }}-registry
   name: user{{ $attendee }}-registry
   namespace: rhoai-model-registries
@@ -14,35 +14,18 @@ metadata:
     - modelregistry.opendatahub.io/finalizer
 spec:
   grpc:
-    image: 'registry.redhat.io/rhoai/odh-mlmd-grpc-server-rhel8@sha256:927a88bade78e121d84e4d072f07a203fb00173af3615e00ce712d45329dde2d'
     port: 9090
-    resources:
-      limits:
-        cpu: 100m
-        memory: 256Mi
-      requests:
-        cpu: 100m
-        memory: 256Mi
   istio:
-    audiences:
-      - 'https://kubernetes.default.svc'
-    authConfigLabels:
-      security.opendatahub.io/authorization-group: default
-    authProvider: redhat-ods-applications-auth-provider
     gateway:
-      domain: {{ $cluster_domain }}
       grpc:
         gatewayRoute: enabled
         port: 443
         tls:
-          credentialName: default-modelregistry-cert
           mode: SIMPLE
-      istioIngress: ingressgateway
       rest:
         gatewayRoute: enabled
         port: 443
         tls:
-          credentialName: default-modelregistry-cert
           mode: SIMPLE
     tlsMode: ISTIO_MUTUAL
   mysql:
