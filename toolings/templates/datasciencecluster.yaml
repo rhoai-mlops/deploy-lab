@@ -16,7 +16,7 @@ spec:
     kserve:
       managementState: Managed
       defaultDeploymentMode: Serverless
-      RawDeploymentServiceConfig: Headed
+      rawDeploymentServiceConfig: Headed
       serving:
         ingressGateway:
           certificate:
