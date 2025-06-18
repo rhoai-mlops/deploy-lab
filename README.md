@@ -1,6 +1,6 @@
 # ML500 MLOps Enablement Lab Deployment
 
-This repository contains the necessary components for instructors to deploy a complete MLOps enablement lab environment on OpenShift using OpenShift AI (RHOAI). This setup is designed for training purposes and **is not intended for student use**.
+This repository contains the necessary components for facilitators to deploy a complete MLOps Enablement lab environment on OpenShift and OpenShift AI (RHOAI).
 
 ## Overview
 
