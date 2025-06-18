@@ -1,13 +1,13 @@
-git clone https://github.com/rhoai-mlops/deploy-lab.git
 
-## Install GitOps Operator and Instance
-helm upgrade --install ml500-gitops gitops --namespace ml500 --create-namespace
+# Install the operators
+helm upgrade --install ml500-base operators --namespace ml500 --create-namespace
 
-## Install Operators (this will be in an AppSet)
-helm upgrade --install ml500-operators operators --namespace ml500 --create-namespace
+# Install the toolings
+helm upgrade --install ml500-toolings toolings --namespace ml500 --create-namespace
 
-## Install helm chart (this will be in an AppSet)
-helm upgrade --install ml500-base charts/ --namespace ml500 --create-namespace
+# Install the toolings
+helm upgrade --install ml500-student-content student-content --namespace ml500 --create-namespace
+
 
 # Patch OAuth to point to ML500 htpasswd
 oc patch --type=merge OAuth/cluster -p '{"spec": {"identityProviders": [{"name": "Students", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd-ml500"}}}, {"name": "htpasswd_provider", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd"}}}]}}'
