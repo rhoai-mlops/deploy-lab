@@ -21,6 +21,7 @@ spec:
   name: gitea-operator
   source: redhat-rhpds-gitea
   sourceNamespace: gitea-operator
+  startingCSV: gitea-operator.v2.1.0
 ---
 apiVersion: v1
 kind: Namespace
