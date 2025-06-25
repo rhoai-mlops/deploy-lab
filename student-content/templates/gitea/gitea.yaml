@@ -5,7 +5,7 @@ metadata:
   name: gitea
   namespace: gitea
 spec:
-  giteaImageTag: 1.20.0
+  giteaImageTag: 1.24.0
   giteaVolumeSize: 4Gi
   giteaSsl: true
   postgresqlVolumeSize: 20Gi
