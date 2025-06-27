@@ -2,6 +2,8 @@
 # Install the operators
 helm upgrade --install ml500-base operators --namespace ml500 --create-namespace
 
+oc wait --for=jsonpath='{.status.availableReplicas}'=1 -n openshift-gitops deployment/cluster
+
 # Install the toolings
 helm upgrade --install ml500-toolings toolings --namespace ml500 --create-namespace
 
@@ -19,7 +21,7 @@ oc -n openshift-user-workload-monitoring patch configmap user-workload-monitorin
 oc patch config.imageregistry.operator.openshift.io/cluster --patch '{"spec":{"defaultRoute":true}}' --type=merge
 
 # Make ArgoCD cluster wide
-attendees=`grep attendees charts/values.yaml | cut -d':' -f2`
+attendees=`grep attendees student-content/values.yaml | cut -d':' -f2`
  for ((i=0; i<=$attendees; i++))
  do
    if [ $i -eq 1 ]; then
