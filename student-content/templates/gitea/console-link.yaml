@@ -1,0 +1,12 @@
+---
+apiVersion: console.openshift.io/v1
+kind: ConsoleLink
+metadata:
+  name: gitea-ml500
+spec:
+  applicationMenu:
+    imageURL: https://gitea-gitea.{{ .Values.cluster_domain }}/assets/img/logo.svg
+    section: OpenShift Self Managed Services
+  href: https://gitea-gitea.{{ .Values.cluster_domain }}/
+  location: ApplicationMenu
+  text: ML500 Gitea Instance
