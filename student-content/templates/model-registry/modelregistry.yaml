@@ -2,7 +2,7 @@
 {{ $attendees := (add1 .Values.attendees | int) }}
 {{- range $attendee := untilStep 1 $attendees 1 }}
 ---
-apiVersion: modelregistry.opendatahub.io/v1alpha1
+apiVersion: modelregistry.opendatahub.io/v1beta1
 kind: ModelRegistry
 metadata:
   annotations:
@@ -15,19 +15,6 @@ metadata:
 spec:
   grpc:
     port: 9090
-  istio:
-    gateway:
-      grpc:
-        gatewayRoute: enabled
-        port: 443
-        tls:
-          mode: SIMPLE
-      rest:
-        gatewayRoute: enabled
-        port: 443
-        tls:
-          mode: SIMPLE
-    tlsMode: ISTIO_MUTUAL
   mysql:
     database: metadb
     host: user{{ $attendee }}-registry-db.user{{ $attendee }}-jukebox.svc.cluster.local
@@ -35,10 +22,12 @@ spec:
       key: database-password
       name: user{{ $attendee }}-registry-db
     port: 3306
-    skipDBCreation: false
     username: root
+  oauthProxy:
+    port: 8443
+    routePort: 443
+    serviceRoute: enabled
   rest:
-    image: 'quay.io/opendatahub/model-registry:v0.2.10'
     port: 8080
     resources:
       limits:
