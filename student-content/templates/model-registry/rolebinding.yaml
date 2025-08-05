@@ -1,22 +1,39 @@
 {{ $attendees := (add1 .Values.attendees | int) }}
 {{- range $attendee := untilStep 1 $attendees 1 }}
 ---
+kind: Group
+apiVersion: user.openshift.io/v1
+metadata:
+  name: user{{ $attendee }}-registry-users
+  labels:
+    app: user{{ $attendee }}-registry
+    app.kubernetes.io/component: model-registry
+    app.kubernetes.io/created-by: model-registry-operator
+    app.kubernetes.io/instance: user{{ $attendee }}-registry-users
+    app.kubernetes.io/managed-by: model-registry-operator
+    app.kubernetes.io/name: user{{ $attendee }}-registry
+    app.kubernetes.io/part-of: model-registry
+    component: model-registry
+users:
+  - user{{ $attendee }}
+---
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: dashboard-permissions-user{{ $attendee }}
+  name: dashboard-permissions-user{{ $attendee }}-registry
   namespace: rhoai-model-registries
   labels:
     app: user{{ $attendee }}-registry
-    app.kubernetes.io/component: user{{ $attendee }}-registry
+    app.kubernetes.io/component: model-registry
     app.kubernetes.io/name: user{{ $attendee }}-registry
-    app.kubernetes.io/part-of: user{{ $attendee }}-registry
-    component: user{{ $attendee }}-registry
+    app.kubernetes.io/part-of: model-registry
+    component: model-registry
     opendatahub.io/dashboard: 'true'
+    opendatahub.io/rb-project-subject: 'true'
 subjects:
-  - kind: User
+  - kind: Group
     apiGroup: rbac.authorization.k8s.io
-    name: user{{ $attendee }}
+    name: 'system:serviceaccounts:user{{ $attendee }}-jukebox'
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role

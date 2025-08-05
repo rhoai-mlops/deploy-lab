@@ -1,30 +1,30 @@
-{{ $attendees := (add1 .Values.attendees | int) }}
-{{- range $attendee := untilStep 1 $attendees 1 }}
----
-kind: Role
-apiVersion: rbac.authorization.k8s.io/v1
-metadata:
-  annotations:
-    openshift.io/description: Can access Model Registry user{{ $attendee }}-registry
-    openshift.io/display-name: Registry User user{{ $attendee }}-registry
-  name: registry-user-user{{ $attendee }}-registry
-  namespace: rhoai-model-registries
-  labels:
-    app: user{{ $attendee }}-registry
-    app.kubernetes.io/component: user{{ $attendee }}-registry
-    app.kubernetes.io/created-by: user{{ $attendee }}-registry-operator
-    app.kubernetes.io/instance: registry-user-user{{ $attendee }}-registry
-    app.kubernetes.io/managed-by: user{{ $attendee }}-registry-operator
-    app.kubernetes.io/name: user{{ $attendee }}-registry
-    app.kubernetes.io/part-of: user{{ $attendee }}-registry
-    component: user{{ $attendee }}-registry
-rules:
-  - verbs:
-      - get
-    apiGroups:
-      - ''
-    resources:
-      - services
-    resourceNames:
-      - user{{ $attendee }}-registry
-{{- end }}
+# {{ $attendees := (add1 .Values.attendees | int) }}
+# {{- range $attendee := untilStep 1 $attendees 1 }}
+# ---
+# kind: Role
+# apiVersion: rbac.authorization.k8s.io/v1
+# metadata:
+#   annotations:
+#     openshift.io/description: Can access Model Registry user{{ $attendee }}-registry
+#     openshift.io/display-name: Registry User user{{ $attendee }}-registry
+#   name: registry-user-user{{ $attendee }}-registry
+#   namespace: rhoai-model-registries
+#   labels:
+#     app: user{{ $attendee }}-registry
+#     app.kubernetes.io/component: user{{ $attendee }}-registry
+#     app.kubernetes.io/created-by: user{{ $attendee }}-registry-operator
+#     app.kubernetes.io/instance: registry-user-user{{ $attendee }}-registry
+#     app.kubernetes.io/managed-by: user{{ $attendee }}-registry-operator
+#     app.kubernetes.io/name: user{{ $attendee }}-registry
+#     app.kubernetes.io/part-of: user{{ $attendee }}-registry
+#     component: user{{ $attendee }}-registry
+# rules:
+#   - verbs:
+#       - get
+#     apiGroups:
+#       - ''
+#     resources:
+#       - services
+#     resourceNames:
+#       - user{{ $attendee }}-registry
+# {{- end }}
