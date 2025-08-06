@@ -1,5 +1,5 @@
 ---
-cluster_domain: apps.cluster-rpmjl.rpmjl.sandbox766.opentlc.com
+cluster_domain: apps.abc.opentlc.com
 attendees: 5
 
 minio:
