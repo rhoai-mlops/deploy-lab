@@ -32,3 +32,9 @@ attendees=`grep attendees student-content/values.yaml | cut -d':' -f2`
  done
  oc -n openshift-gitops-operator patch subscriptions.operators.coreos.com/openshift-gitops-operator --type=json \
          -p '[{"op":"'add'","path":"/spec/config/env", "value":[{"name": "DISABLE_DEFAULT_ARGOCD_INSTANCE", "value":"true"}] },{"op":"'add'","path":"/spec/config/env/1","value":{"name": "ARGOCD_CLUSTER_CONFIG_NAMESPACES", "value":"'${NS}'"}}]'
+
+
+# Disable affinity assistant in Tekton to avoid it hogging PVCs
+oc patch configmap feature-flags -n openshift-pipelines --type merge -p '{"data":{"disable-affinity-assistant":"true","coschedule":"disabled"}}'
+oc patch configmap config-defaults -n openshift-pipelines --type merge -p '{"data":{"default-affinity-assistant-pod-template":"","default-pod-template":""}}'
+oc delete pod -l app=tekton-pipelines-controller -n openshift-pipelines
