@@ -40,7 +40,7 @@ oc patch configmap config-defaults -n openshift-pipelines --type merge -p '{"dat
 oc delete pod -l app=tekton-pipelines-controller -n openshift-pipelines
 
 # Finish RHACS installation
-oc --loglevel=8 -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
+oc -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
 CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
 curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-admin-token.json
 TOKEN="$(jq -r .token < rhacs-admin-token.json)"
