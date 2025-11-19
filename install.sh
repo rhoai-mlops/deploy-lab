@@ -38,3 +38,39 @@ attendees=`grep attendees student-content/values.yaml | cut -d':' -f2`
 oc patch configmap feature-flags -n openshift-pipelines --type merge -p '{"data":{"disable-affinity-assistant":"true","coschedule":"disabled"}}'
 oc patch configmap config-defaults -n openshift-pipelines --type merge -p '{"data":{"default-affinity-assistant-pod-template":"","default-pod-template":""}}'
 oc delete pod -l app=tekton-pipelines-controller -n openshift-pipelines
+
+# Finish RHACS installation
+oc --loglevel=8 -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
+CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
+curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-admin-token.json
+TOKEN="$(jq -r .token < rhacs-admin-token.json)"
+curl -sk -H "Authorization: Bearer ${TOKEN}" -XPOST -d '{"name": "local-cluster"}' https://${CENTRAL}/v1/cluster-init/init-bundles > cluster-init-bundle.json
+jq -r .kubectlBundle < cluster-init-bundle.json | base64 -d | oc -n rhacs-operator create -f -
+cat <<EOF | oc apply -f -
+apiVersion: platform.stackrox.io/v1alpha1
+kind: SecuredCluster
+metadata:
+  annotations:
+    feature-defaults.platform.stackrox.io/admissionControllerEnforcement: Disabled
+  name: stackrox-secured-cluster-services
+  namespace: rhacs-operator
+spec:
+  admissionControl:
+    bypass: BreakGlassAnnotation
+    enforcement: Enabled
+    failurePolicy: Ignore
+    replicas: 2
+  auditLogs:
+    collection: Enabled
+  clusterName: local-cluster
+  perNode:
+    collector:
+      collection: CORE_BPF
+  processBaselines:
+    autoLock: Enabled
+  scanner:
+    scannerComponent: AutoSense
+  scannerV4:
+    scannerComponent: AutoSense
+EOF
+
