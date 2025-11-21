@@ -76,4 +76,3 @@ EOF
 
 # NOTE: it will take a couple of hours for vuln updates to be downloaded
 
-
