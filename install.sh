@@ -44,7 +44,7 @@ oc -n rhacs-operator wait central/stackrox-central-services --for=condition=Depl
 CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
 curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-admin-token.json
 TOKEN="$(jq -r .token < rhacs-admin-token.json)"
-curl -sk -H "Authorization: Bearer ${TOKEN}" -XPOST -d '{"name": "local-cluster"}' https://${CENTRAL}/v1/cluster-init/init-bundles > cluster-init-bundle.json
+curl -sk -H "Authorization: Bearer ${TOKEN}" -XPOST -d '{"name": "my-cluster"}' https://${CENTRAL}/v1/cluster-init/init-bundles > cluster-init-bundle.json
 jq -r .kubectlBundle < cluster-init-bundle.json | base64 -d | oc -n rhacs-operator create -f -
 cat <<EOF | oc apply -f -
 apiVersion: platform.stackrox.io/v1alpha1
@@ -62,7 +62,7 @@ spec:
     replicas: 2
   auditLogs:
     collection: Enabled
-  clusterName: local-cluster
+  clusterName: my-cluster
   perNode:
     collector:
       collection: CORE_BPF
