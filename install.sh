@@ -73,6 +73,27 @@ spec:
   scannerV4:
     scannerComponent: AutoSense
 EOF
-
 # NOTE: it will take a couple of hours for vuln updates to be downloaded
+
+# Generate RHACS tokens for all attendees
+echo "Generating RHACS tokens for $attendees attendees..."
+for ((i=1; i<=$attendees; i++)); do
+  echo "Creating token for user$i..."
+
+  # Generate individual token for each user
+  curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-user$i-token.json
+
+  # Extract the token
+  USER_TOKEN="$(jq -r .token < rhacs-user$i-token.json)"
+
+  # Create Kubernetes secret in user's namespace
+  kubectl create secret generic rox-auth-ml500 \
+    --from-literal=password="$USER_TOKEN" \
+    -n user$i-toolings \
+    --dry-run=client -o yaml | kubectl apply -f -
+
+  echo "Token created and secret stored for user$i in namespace user$i-toolings"
+done
+
+echo "All RHACS tokens have been generated and stored as secrets."
 
