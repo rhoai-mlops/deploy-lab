@@ -1,0 +1,30 @@
+apiVersion: platform.stackrox.io/v1alpha1
+kind: Central
+metadata:
+  name: stackrox-central-services
+  namespace: rhacs-operator
+spec:
+  central:
+    adminPasswordSecret:
+      name: central-admin-password
+    exposure:
+      route:
+        enabled: true
+  egress:
+    connectivityPolicy: Online
+  scanner:
+    analyzer:
+      scaling:
+        autoScaling: Disabled
+        replicas: 1
+    scannerComponent: Enabled
+  scannerV4:
+    indexer:
+      scaling:
+        autoScaling: Disabled
+        replicas: 1
+    matcher:
+      scaling:
+        autoScaling: Disabled
+        replicas: 1
+    scannerComponent: Enabled
