@@ -6,9 +6,9 @@ metadata:
   namespace: gitea
 spec:
   giteaImageTag: 1.24.0
-  giteaVolumeSize: 4Gi
+  giteaVolumeSize: 8Gi
   giteaSsl: true
-  postgresqlVolumeSize: 20Gi
+  postgresqlVolumeSize: 40Gi
   giteaAdminUser: opentlc-mgr
   giteaAdminEmail: opentlc-mgr@redhat.com
   giteaAdminPasswordSecretName: gitea-admin-password
