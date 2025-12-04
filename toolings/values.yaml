@@ -1,1 +1,13 @@
 ---
+stackrox:
+  namespace: rhacs-operator
+  clusterName: my-cluster
+  verbose: false
+  analyzer:
+    resources:
+      requests:
+        memory: "1500Mi"
+        cpu: "1000m"
+      limits:
+        memory: "3Gi"
+        cpu: "2000m"
