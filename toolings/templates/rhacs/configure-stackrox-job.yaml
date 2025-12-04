@@ -1,0 +1,113 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: configure-stackrox
+  namespace: rhacs-operator
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "3"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+        - image: quay.io/rht-labs/stack-do500:3.0.8
+          command:
+            - /bin/bash
+            - -c
+            - |
+              set -e
+              {{- if .Values.stackrox.verbose }}
+              set -x
+              {{- end }}
+
+              echo "Starting RHACS Day 2 Configuration..."
+
+              # Wait for Central to be deployed
+              echo "Waiting for Central to be deployed..."
+              oc -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
+
+              # Get Central route
+              CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
+              echo "Central endpoint: ${CENTRAL}"
+
+              # Generate API token
+              echo "Generating API token..."
+              curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > /tmp/rhacs-admin-token.json
+              TOKEN="$(jq -r .token < /tmp/rhacs-admin-token.json)"
+
+              if [ -z "$TOKEN" ] || [ "$TOKEN" = "null" ]; then
+                echo "Failed to generate API token"
+                cat /tmp/rhacs-admin-token.json
+                exit 1
+              fi
+              echo "API token generated successfully"
+
+              # Generate init bundle
+              echo "Generating init bundle..."
+              curl -sk -H "Authorization: Bearer ${TOKEN}" -XPOST -d '{"name": "{{ .Values.stackrox.clusterName }}"}' https://${CENTRAL}/v1/cluster-init/init-bundles > /tmp/cluster-init-bundle.json
+
+              if ! jq -e .kubectlBundle /tmp/cluster-init-bundle.json >/dev/null 2>&1; then
+                echo "Failed to generate init bundle"
+                cat /tmp/cluster-init-bundle.json
+                exit 1
+              fi
+
+              echo "Applying init bundle..."
+              jq -r .kubectlBundle < /tmp/cluster-init-bundle.json | base64 -d | oc -n rhacs-operator apply -f -
+              echo "Init bundle applied successfully"
+
+              # create secured cluster
+              echo "Creating SecuredCluster..."
+              # Check if SecuredCluster already exists
+              if oc -n rhacs-operator get securedcluster stackrox-secured-cluster-services >/dev/null 2>&1; then
+                echo "SecuredCluster already exists, updating..."
+              else
+                echo "Creating new SecuredCluster..."
+              fi
+
+              cat <<EOF | oc apply -f-
+              apiVersion: platform.stackrox.io/v1alpha1
+              kind: SecuredCluster
+              metadata:
+                annotations:
+                  feature-defaults.platform.stackrox.io/admissionControllerEnforcement: Disabled
+                name: stackrox-secured-cluster-services
+                namespace: rhacs-operator
+              spec:
+                clusterName: {{ .Values.stackrox.clusterName | quote }}
+                admissionControl:
+                  bypass: BreakGlassAnnotation
+                  enforcement: Enabled
+                  failurePolicy: Ignore
+                  replicas: 2
+                auditLogs:
+                  collection: Enabled
+                perNode:
+                  collector:
+                    collection: CORE_BPF
+                processBaselines:
+                  autoLock: Enabled
+                scanner:
+                  scannerComponent: AutoSense
+                scannerV4:
+                  scannerComponent: AutoSense
+              EOF
+
+              if [ $? -eq 0 ]; then
+                echo "SecuredCluster created successfully"
+                echo "RHACS Day 2 Configuration completed successfully"
+              else
+                echo "Failed to create SecuredCluster"
+                exit 1
+              fi
+
+              exit 0
+          imagePullPolicy: Always
+          name: configure-stackrox
+      dnsPolicy: ClusterFirst
+      restartPolicy: OnFailure
+      serviceAccount: configure-stackrox
+      serviceAccountName: configure-stackrox
+      terminationGracePeriodSeconds: 10

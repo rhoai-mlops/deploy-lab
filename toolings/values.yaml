@@ -3,6 +3,11 @@ stackrox:
   namespace: rhacs-operator
   clusterName: my-cluster
   verbose: false
+  oauth:
+    enabled: true
+    authProvider: OpenShift
+    authProviderType: openshift
+    minAccessRole: Analyst
   analyzer:
     resources:
       requests:
