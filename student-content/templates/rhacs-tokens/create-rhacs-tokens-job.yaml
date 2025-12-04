@@ -1,0 +1,77 @@
+{{ $attendees := (add1 .Values.attendees | int) }}
+{{- range $attendee := untilStep 1 $attendees 1 }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-rhacs-tokens
+  namespace: user{{ $attendee }}-toolings
+spec:
+  backoffLimit: 4
+  template:
+    spec:
+      serviceAccount: create-rhacs-tokens
+      serviceAccountName: create-rhacs-tokens
+      restartPolicy: Never
+      containers:
+      - name: create-rhacs-tokens
+        image: quay.io/rht-labs/stack-do500:3.0.8
+        imagePullPolicy: IfNotPresent
+        command:
+        - /bin/bash
+        - -c
+        - |
+          set -e
+          echo "Generating RHACS token for user{{ $attendee }}..."
+          sleep 15
+          # Get Central route
+          CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
+          echo "Central endpoint: ${CENTRAL}"
+
+          # Wait for Central API to be ready
+          echo "Waiting for Central API to be ready..."
+          MAX_RETRIES=30
+          RETRY_COUNT=0
+          until curl -sk -u admin:myPassw0rd https://${CENTRAL}/v1/ping >/dev/null 2>&1; do
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            if [ $RETRY_COUNT -ge $MAX_RETRIES ]; then
+              echo "Central API is not ready after ${MAX_RETRIES} attempts"
+              exit 1
+            fi
+            echo "Waiting for Central API... (attempt ${RETRY_COUNT}/${MAX_RETRIES})"
+            sleep 10
+          done
+          echo "Central API is ready"
+
+          # Generate individual token for user{{ $attendee }}
+          echo "Creating RHACS API token for user{{ $attendee }}..."
+          curl -sk -u admin:myPassw0rd -XPOST \
+            -d '{"name": "user{{ $attendee }} token", "role": null, "roles": ["Admin"]}' \
+            https://${CENTRAL}/v1/apitokens/generate > /tmp/rhacs-user{{ $attendee }}-token.json
+
+          # Extract the token
+          USER_TOKEN="$(jq -r .token < /tmp/rhacs-user{{ $attendee }}-token.json)"
+
+          if [ -z "$USER_TOKEN" ] || [ "$USER_TOKEN" = "null" ]; then
+            echo "Failed to generate token for user{{ $attendee }}"
+            cat /tmp/rhacs-user{{ $attendee }}-token.json
+            exit 1
+          fi
+
+          echo "Token generated successfully for user{{ $attendee }}"
+
+          # Create or update Kubernetes secret in user's namespace
+          cat <<EOF | oc apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: rox-auth-ml500
+            namespace: user{{ $attendee }}-toolings
+          type: Opaque
+          stringData:
+            password: "${USER_TOKEN}"
+          EOF
+
+          echo "Secret rox-auth-ml500 created/updated in namespace user{{ $attendee }}-toolings"
+          echo "RHACS token configuration completed successfully for user{{ $attendee }}"
+{{- end }}
