@@ -22,9 +22,8 @@ spec:
         - -c
         - |
           set -e
-
           echo "Generating RHACS token for user{{ $attendee }}..."
-
+          sleep 15
           # Get Central route
           CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
           echo "Central endpoint: ${CENTRAL}"
