@@ -1,17 +1,17 @@
 
 # Install the operators
-helm upgrade --install ml500-base operators --namespace ml500 --create-namespace
+helm upgrade --install ai500-base operators --namespace ai500 --create-namespace
 
 oc wait --for=jsonpath='{.status.availableReplicas}'=1 -n openshift-gitops deployment/cluster
 
 # Install the toolings
-helm upgrade --install ml500-toolings toolings --namespace ml500 --create-namespace
+helm upgrade --install ai500-toolings toolings --namespace ai500 --create-namespace
 
 # Install the toolings
-helm upgrade --install ml500-student-content student-content --namespace ml500 --create-namespace
+helm upgrade --install ai500-student-content student-content --namespace ai500 --create-namespace
 
 
-# Patch OAuth to point to ML500 htpasswd
+# Patch OAuth to point to ai500 htpasswd
 oc patch --type=merge OAuth/cluster -p '{"spec": {"identityProviders": [{"name": "Students", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd-ml500"}}}, {"name": "htpasswd_provider", "type": "HTPasswd", "mappingMethod": "claim", "htpasswd": {"fileData": {"name": "htpasswd"}}}]}}'
 
 # oc patch --type=merge DataScienceCluster/default-dsc -p '{"spec": {"components": {"trustyai": {"managementState": "Managed", "devFlags": {"manifests": [{"contextDir": "config", "sourcePath": "", "uri": "https://api.github.com/repos/ckavili/trustyai-service-operator-ci/tarball/service-acca8f52f3f163444b2fc68003af5cae13f04762"}]}}}}}'
@@ -38,62 +38,4 @@ attendees=`grep attendees student-content/values.yaml | cut -d':' -f2`
 oc patch configmap feature-flags -n openshift-pipelines --type merge -p '{"data":{"disable-affinity-assistant":"true","coschedule":"disabled"}}'
 oc patch configmap config-defaults -n openshift-pipelines --type merge -p '{"data":{"default-affinity-assistant-pod-template":"","default-pod-template":""}}'
 oc delete pod -l app=tekton-pipelines-controller -n openshift-pipelines
-
-# Finish RHACS installation
-oc -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
-CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
-curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-admin-token.json
-TOKEN="$(jq -r .token < rhacs-admin-token.json)"
-curl -sk -H "Authorization: Bearer ${TOKEN}" -XPOST -d '{"name": "my-cluster"}' https://${CENTRAL}/v1/cluster-init/init-bundles > cluster-init-bundle.json
-jq -r .kubectlBundle < cluster-init-bundle.json | base64 -d | oc -n rhacs-operator create -f -
-cat <<EOF | oc apply -f -
-apiVersion: platform.stackrox.io/v1alpha1
-kind: SecuredCluster
-metadata:
-  annotations:
-    feature-defaults.platform.stackrox.io/admissionControllerEnforcement: Disabled
-  name: stackrox-secured-cluster-services
-  namespace: rhacs-operator
-spec:
-  admissionControl:
-    bypass: BreakGlassAnnotation
-    enforcement: Enabled
-    failurePolicy: Ignore
-    replicas: 2
-  auditLogs:
-    collection: Enabled
-  clusterName: my-cluster
-  perNode:
-    collector:
-      collection: CORE_BPF
-  processBaselines:
-    autoLock: Enabled
-  scanner:
-    scannerComponent: AutoSense
-  scannerV4:
-    scannerComponent: AutoSense
-EOF
-# NOTE: it will take a couple of hours for vuln updates to be downloaded
-
-# Generate RHACS tokens for all attendees
-echo "Generating RHACS tokens for $attendees attendees..."
-for ((i=1; i<=$attendees; i++)); do
-  echo "Creating token for user$i..."
-
-  # Generate individual token for each user
-  curl -sk -u admin:myPassw0rd -XPOST -d '{"name": "admin token", "role": null, "roles": ["Admin"]}' https://${CENTRAL}/v1/apitokens/generate > rhacs-user$i-token.json
-
-  # Extract the token
-  USER_TOKEN="$(jq -r .token < rhacs-user$i-token.json)"
-
-  # Create Kubernetes secret in user's namespace
-  kubectl create secret generic rox-auth-ml500 \
-    --from-literal=password="$USER_TOKEN" \
-    -n user$i-toolings \
-    --dry-run=client -o yaml | kubectl apply -f -
-
-  echo "Token created and secret stored for user$i in namespace user$i-toolings"
-done
-
-echo "All RHACS tokens have been generated and stored as secrets."
 

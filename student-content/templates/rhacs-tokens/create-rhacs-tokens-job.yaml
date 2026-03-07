@@ -65,13 +65,13 @@ spec:
           apiVersion: v1
           kind: Secret
           metadata:
-            name: rox-auth-ml500
+            name: rox-auth-ai500
             namespace: user{{ $attendee }}-toolings
           type: Opaque
           stringData:
             password: "${USER_TOKEN}"
           EOF
 
-          echo "Secret rox-auth-ml500 created/updated in namespace user{{ $attendee }}-toolings"
+          echo "Secret rox-auth-ai500 created/updated in namespace user{{ $attendee }}-toolings"
           echo "RHACS token configuration completed successfully for user{{ $attendee }}"
 {{- end }}

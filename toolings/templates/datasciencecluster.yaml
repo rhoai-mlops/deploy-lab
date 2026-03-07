@@ -1,45 +1,44 @@
 ---
+apiVersion: datasciencecluster.opendatahub.io/v2
 kind: DataScienceCluster
-apiVersion: datasciencecluster.opendatahub.io/v1
 metadata:
-  name: default-dsc
   labels:
     app.kubernetes.io/name: datasciencecluster
-    app.kubernetes.io/instance: default-dsc
-    app.kubernetes.io/part-of: rhods-operator
-    app.kubernetes.io/managed-by: kustomize
-    app.kubernetes.io/created-by: rhods-operator
+  name: default-dsc
 spec:
   components:
-    codeflare:
-      managementState: Managed
     kserve:
       managementState: Managed
-      defaultDeploymentMode: Serverless
-      rawDeploymentServiceConfig: Headless
-      serving:
-        ingressGateway:
-          certificate:
-            secretName: knative-serving-cert
-            type: OpenshiftDefaultIngress
+      nim:
         managementState: Managed
-        name: knative-serving
+      rawDeploymentServiceConfig: Headless
     modelregistry:
       managementState: Managed
       registriesNamespace: rhoai-model-registries
+    feastoperator:
+      managementState: Managed
     trustyai:
+      eval:
+        lmeval:
+          permitCodeExecution: deny
+          permitOnline: deny
+      managementState: Managed
+    aipipelines:
+      argoWorkflowsControllers:
+        managementState: Managed
       managementState: Managed
     ray:
       managementState: Managed
     kueue:
-      managementState: Managed
+      defaultClusterQueueName: default
+      defaultLocalQueueName: default
+      managementState: Removed
     workbenches:
       managementState: Managed
+      workbenchNamespace: rhods-notebooks
     dashboard:
       managementState: Managed
-    modelmeshserving:
-      managementState: Managed
-    datasciencepipelines:
-      managementState: Managed
-    trainingoperator:
+    llamastackoperator:
       managementState: Removed
+    trainingoperator:
+      managementState: Managed                                                                                                                                                                                  
