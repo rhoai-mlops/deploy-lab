@@ -1,0 +1,30 @@
+{{ $attendees := (add1 .Values.attendees | int) }}
+{{- range $attendee := untilStep 1 $attendees 1 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kserve-logger-ca-bundle
+  namespace: user{{ $attendee}}-jukebox
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kserve-logger-ca-bundle
+  namespace: user{{ $attendee}}-test
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data: {}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kserve-logger-ca-bundle
+  namespace: user{{ $attendee}}-prod
+  annotations:
+    service.beta.openshift.io/inject-cabundle: "true"
+data: {}
+{{- end }}
