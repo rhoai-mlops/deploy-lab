@@ -1,0 +1,13 @@
+---
+kind: Central
+apiVersion: platform.stackrox.io/v1alpha1
+metadata:
+  name: stackrox-central-services
+  namespace: rhacs-operator
+spec:
+  central:
+    adminPasswordSecret:
+      name: central-admin-password
+    exposure:
+      route:
+        enabled: true

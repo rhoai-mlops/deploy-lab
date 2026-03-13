@@ -5,9 +5,9 @@ metadata:
   annotations:
     opendatahub.io/notebook-image-creator: ckavili@redhat.com
     opendatahub.io/notebook-image-desc: 'Code Server notebook image to run MLOps exercises'
-    opendatahub.io/notebook-image-name: ml500-code-server
-    opendatahub.io/notebook-image-url: 'quay.io/rhoai-mlops/custom-code-server:0.0.3'
-  name: ml500-code-server
+    opendatahub.io/notebook-image-name: ai500-code-server
+    opendatahub.io/notebook-image-url: 'quay.io/rhoai-mlops/custom-code-server:0.0.4'
+  name: ai500-code-server
   namespace: redhat-ods-applications
   labels:
     app.kubernetes.io/created-by: byon
@@ -17,13 +17,13 @@ spec:
   lookupPolicy:
     local: true
   tags:
-    - name: ml500-code-server-v0.0.3
+    - name: ai500-code-server-v0.0.4
       annotations:
         opendatahub.io/notebook-software: '[{"name":"helm","version":"3.17.2","visible":true}]'
-        openshift.io/imported-from: 'quay.io/rhoai-mlops/custom-code-server:0.0.3'
+        openshift.io/imported-from: 'quay.io/rhoai-mlops/custom-code-server:0.0.4'
       from:
         kind: DockerImage
-        name: 'quay.io/rhoai-mlops/custom-code-server:0.0.3'
+        name: 'quay.io/rhoai-mlops/custom-code-server:0.0.4'
       generation: 2
       importPolicy:
         importMode: Legacy

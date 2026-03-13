@@ -28,6 +28,10 @@ spec:
               echo "Waiting for Central to be deployed..."
               oc -n rhacs-operator wait central/stackrox-central-services --for=condition=Deployed=True --timeout=300s
 
+              # Wait for scanner deployment to be ready
+              echo "Waiting for scanner deployment to be ready..."
+              oc -n rhacs-operator rollout status deployment/scanner --timeout=600s
+
               # Get Central route
               CENTRAL="$(oc -n rhacs-operator get routes/central -o jsonpath='{.spec.host}')"
               echo "Central endpoint: ${CENTRAL}"

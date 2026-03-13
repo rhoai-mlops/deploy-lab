@@ -10,16 +10,17 @@ metadata:
     "helm.sh/hook-weight": "3"
   name: dspa
   namespace: user{{ $attendee }}-jukebox
-  finalizers:
-    - datasciencepipelinesapplications.opendatahub.io/finalizer
 spec:
   apiServer:
-    artifactSignedURLExpirySeconds: 60
     caBundleFileMountPath: ''
     caBundleFileName: ''
     deploy: true
-    enableOauth: true
+    artifactSignedURLExpirySeconds: 60
     enableSamplePipeline: false
+    managedPipelines: {}
+    enableOauth: true
+    cacheEnabled: true
+    pipelineStore: kubernetes
   database:
     disableHealthCheck: false
     mariaDB:

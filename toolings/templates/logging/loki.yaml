@@ -18,7 +18,6 @@ spec:
   tenants:
     mode: openshift-logging
 ---
----
 apiVersion: v1
 kind: Secret
 metadata:

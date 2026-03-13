@@ -1,4 +1,4 @@
-# ML500 MLOps Enablement Lab Deployment
+# AI500 (formerly known as ML500) MLOps Enablement Lab Deployment
 
 This repository contains the necessary components for facilitators to deploy a complete MLOps Enablement lab environment on OpenShift and OpenShift AI (RHOAI).
 
