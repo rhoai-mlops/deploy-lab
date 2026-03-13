@@ -9,6 +9,8 @@ spec:
   components:
     kserve:
       managementState: Managed
+      modelsAsService:
+        managementState: Removed
       nim:
         managementState: Managed
       rawDeploymentServiceConfig: Headless
@@ -36,9 +38,11 @@ spec:
     workbenches:
       managementState: Managed
       workbenchNamespace: rhods-notebooks
+    mlflowoperator: {}
     dashboard:
       managementState: Managed
+    trainer: {}
     llamastackoperator:
       managementState: Removed
     trainingoperator:
-      managementState: Managed                                                                                                                                                                                  
+      managementState: Managed

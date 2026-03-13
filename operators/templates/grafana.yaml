@@ -6,8 +6,7 @@ metadata:
   namespace: openshift-operators
 spec:
   channel: v5
-  installPlanApproval: Manual
+  installPlanApproval: utomati
   name: grafana-operator
   source: community-operators
   sourceNamespace: openshift-marketplace
-  startingCSV: grafana-operator.v5.21.2
