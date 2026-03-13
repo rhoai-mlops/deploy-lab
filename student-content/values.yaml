@@ -1,5 +1,5 @@
 ---
-cluster_domain: apps.cluster-pzt9j.pzt9j.sandbox2845.opentlc.com
+cluster_domain: apps.cluster-abc.abc.sandbox2845.opentlc.com
 attendees: 5
 
 minio:
