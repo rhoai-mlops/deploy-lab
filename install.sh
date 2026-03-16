@@ -5,7 +5,7 @@ helm upgrade --install ai500-base operators --namespace ai500 --create-namespace
 
 # Wait for all operators (CSVs) to be ready
 echo "Waiting for operators to install..."
-for ns in openshift-operators redhat-ods-operator openshift-operators-redhat; do
+for ns in openshift-operators redhat-ods-operator openshift-operators-redhat openshift-keda; do
   while true; do
     TOTAL=$(oc get csv -n "$ns" --no-headers 2>/dev/null | wc -l)
     SUCCEEDED=$(oc get csv -n "$ns" --no-headers 2>/dev/null | grep -c Succeeded)
