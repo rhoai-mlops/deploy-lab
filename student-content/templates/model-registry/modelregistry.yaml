@@ -15,6 +15,10 @@ metadata:
 spec:
   grpc:
     port: 9090
+  kubeRBACProxy:
+    port: 8443
+    routePort: 443
+    serviceRoute: enabled
   mysql:
     database: metadb
     host: user{{ $attendee }}-registry-db.user{{ $attendee }}-jukebox.svc.cluster.local
@@ -23,10 +27,6 @@ spec:
       name: user{{ $attendee }}-registry-db
     port: 3306
     username: root
-  oauthProxy:
-    port: 8443
-    routePort: 443
-    serviceRoute: enabled
   rest:
     port: 8080
     resources:
