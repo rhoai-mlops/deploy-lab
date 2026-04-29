@@ -130,7 +130,6 @@ spec:
 #     termination: edge
 #     insecureEdgeTerminationPolicy: Redirect
 ---
----
 kind: Secret
 apiVersion: v1
 metadata:
@@ -164,22 +163,15 @@ spec:
   selector:
     app: minio
 ---
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
+apiVersion: v1
+kind: ServiceAccount
 metadata:
-  name: create-bucket-cr
+  name: minio-job
+  namespace: openshift-logging
   annotations:
     "helm.sh/hook": pre-install
-    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-weight": "-10"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
-rules:
-- apiGroups:
-  - ""
-  resources:
-  - pods
-  verbs:
-  - get
-  - list
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -192,10 +184,10 @@ metadata:
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: create-bucket-cr
+  name: admin
 subjects:
 - kind: ServiceAccount
-  name: default
+  name: minio-job
   namespace: openshift-logging
 ---
 apiVersion: batch/v1
@@ -211,8 +203,8 @@ spec:
   template:
     spec:
       restartPolicy: Never
-      serviceAccount: default
-      serviceAccountName: default
+      serviceAccount: minio-job
+      serviceAccountName: minio-job
       containers:
       - name: job
         image: "quay.io/openshift/origin-cli:latest"
@@ -222,7 +214,5 @@ spec:
           - -c
           - | # create bucket
             oc -n openshift-logging wait pod --for=condition=Ready -l app=minio
-            curl -o /tmp/mc https://dl.min.io/client/mc/release/linux-amd64/mc
-            chmod +x /tmp/mc
-            /tmp/mc --config-dir /tmp/ alias set myminio http://minio-service.openshift-logging.svc.cluster.local:9000 minio IJrixDGbADAkgey5
-            /tmp/mc --config-dir /tmp/ mb myminio/loki
+            oc rsh `oc get pod -l app=minio -o name` mkdir /data/loki
+            echo "🍒 loki bucket is created."
