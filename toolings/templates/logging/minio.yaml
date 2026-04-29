@@ -222,7 +222,5 @@ spec:
           - -c
           - | # create bucket
             oc -n openshift-logging wait pod --for=condition=Ready -l app=minio
-            curl -o /tmp/mc https://dl.min.io/client/mc/release/linux-amd64/mc
-            chmod +x /tmp/mc
-            /tmp/mc --config-dir /tmp/ alias set myminio http://minio-service.openshift-logging.svc.cluster.local:9000 minio IJrixDGbADAkgey5
-            /tmp/mc --config-dir /tmp/ mb myminio/loki
+            oc rsh `oc get pod -l app=minio -o name` mkdir /data/loki
+            echo "🍒 loki bucket is created."
