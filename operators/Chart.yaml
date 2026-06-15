@@ -11,6 +11,6 @@ maintainers:
   - name: ckavili
 dependencies:
   - name: sealed-secrets
-    version: "2.17.2"
-    repository: https://bitnami-labs.github.io/sealed-secrets
+    version: "2.18.6"
+    repository: https://bitnami.github.io/sealed-secrets
     condition: sealed-secrets.enabled
