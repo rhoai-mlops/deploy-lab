@@ -34,7 +34,7 @@ oc patch configmap inferenceservice-config -n redhat-ods-applications --type=jso
 # Patch trustyai-service-operator-config ConfigMap
 oc annotate configmap trustyai-service-operator-config -n redhat-ods-applications opendatahub.io/managed="false" --overwrite
 oc -n redhat-ods-applications patch configmap trustyai-service-operator-config --type=merge \
-  -p '{"data":{"trustyaiServiceImage":"quay.io/ckavili/trustyai-service-python:latest"}}'
+  -p '{"data":{"trustyaiServiceImage":"quay.io/rh-ee-sudsinha/trustyai-service:gzip-payload-fix-v2"}}'
 
 # Apply user workload monitoring config
 oc -n openshift-user-workload-monitoring patch configmap user-workload-monitoring-config --type=merge -p '{"data": {"config.yaml": "prometheus:\n  logLevel: debug\n  retention: 15d\nalertmanager:\n  enabled: true\n  enableAlertmanagerConfig: true\n"}}'
