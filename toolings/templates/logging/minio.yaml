@@ -80,7 +80,7 @@ spec:
               subPath: minio
           terminationMessagePolicy: File
           image: >-
-            quay.io/minio/minio:RELEASE.2024-06-29T01-20-47Z
+            quay.io/rhoai-genaiops/minio:RELEASE.2025-09-07T16-13-09Z
           args:
             - server
             - /data
